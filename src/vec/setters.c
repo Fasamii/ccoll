@@ -1,8 +1,10 @@
-#include "../../error_codes.h"
+#include "../../colors.h"
 #include "../../include/vec.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 Vec *Vec_init(size_t size_of_data) {
 
@@ -168,4 +170,59 @@ Vec *Vec_append_clone(Vec *vec1, Vec *vec2) {
 	vec->size = vec1->size + vec2->size;
 
 	return vec;
+}
+
+int Vec_split(Vec *base, Vec *new_vec, size_t idx) {
+	if (!base || !new_vec) return CCOLL_INVALID_ARGUMENT;
+	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
+	if (!base->data) return CCOLL_INVALID_ARGUMENT;
+
+	new_vec->element_size = base->element_size;
+
+	if (_Vec_realloc_checked(new_vec, base->size - idx))
+		return CCOLL_OUT_OF_MEMORY;
+
+	if (base->destructor) {
+		new_vec->destructor = base->destructor;
+	}
+
+	memcpy(
+	    new_vec->data, base->data + (idx * base->element_size),
+	    (base->size - idx) * base->element_size
+	);
+
+	new_vec->size = base->size - idx; // NOTE: depends on base->size
+	base->size = idx; // NOTE: new_vec size is dependent on that so it have to
+				// be set second
+
+	return CCOLL_SUCCESS;
+}
+
+int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx) {
+	if (!base || !new_vec1 || !new_vec2) return CCOLL_INVALID_ARGUMENT;
+	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
+	if (!base->data) return CCOLL_INVALID_ARGUMENT;
+
+	new_vec1->element_size = base->element_size;
+	new_vec2->element_size = base->element_size;
+
+	if (_Vec_realloc_checked(new_vec1, idx)) return CCOLL_OUT_OF_MEMORY;
+	if (_Vec_realloc_checked(new_vec2, base->size - idx))
+		return CCOLL_OUT_OF_MEMORY;
+
+	if (base->destructor) {
+		new_vec1->destructor = base->destructor;
+		new_vec2->destructor = base->destructor;
+	}
+
+	memcpy(new_vec1->data, base->data, idx * base->element_size);
+	memcpy(
+	    new_vec2->data, base->data + (idx * base->element_size),
+	    (base->size - idx) * base->element_size
+	);
+
+	new_vec1->size = idx;
+	new_vec2->size = base->size - idx;
+
+	return CCOLL_SUCCESS;
 }

@@ -1,5 +1,3 @@
-#include "error_codes.h"
-
 #ifndef CCOLL_H
 #define CCOLL_H
 

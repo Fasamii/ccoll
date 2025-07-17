@@ -1,48 +1,53 @@
-NAME = ccoll
-BUILD_DIR = build
-SRC_DIR = src
-INCLUDE_DIR = include
-OBJ_DIR = $(BUILD_DIR)/obj
-LIB_DIR = $(BUILD_DIR)/lib
+# === Config ===
+NAME       := ccoll
+BUILD_DIR  := build
+SRC_DIR    := src
+INCLUDE_DIR:= include
+OBJ_DIR    := $(BUILD_DIR)/obj
+LIB_DIR    := $(BUILD_DIR)/lib
 
-CC = gcc
-AR = ar
-CFLAGS = -Wall -Wextra -std=c99 -O2 -I$(INCLUDE_DIR)
-ARFLAGS = rcs
+# === Tools ===
+CC     := gcc
+AR     := ar
+RANLIB := ranlib
+CFLAGS := -Wall -Wextra -std=c99 -O2 -I$(INCLUDE_DIR)
+ARFLAGS:= rcs
 
-MODULES := vec llist
+MODULES := vec llist mmap
 
-# === Build Targets ===
-.PHONY: all clean $(MODULES) ccoll
+.PHONY: all clean ccoll $(MODULES)
 
-# Default: build all modules
-all: ccoll
+# Default: build everything (individual libs + combined lib)
+all: $(MODULES) ccoll
 
-# Build full ccoll library (all modules)
-ccoll: $(addprefix $(LIB_DIR)/lib,$(addsuffix .a,$(MODULES)))
-	@mkdir -p $(LIB_DIR)
-	$(AR) $(ARFLAGS) $(LIB_DIR)/lib$(NAME).a $^
-	@echo "[✓] Built static lib: $(LIB_DIR)/lib$(NAME).a"
+# Build individual module libraries
+$(MODULES): %: $(LIB_DIR)/lib%.a
 
-# Build individual module archives
-$(MODULES):
-	$(MAKE) module MODULE=$@
-
-module:
-	@echo "[+] Building module: $(MODULE)"
-	$(MAKE) $(LIB_DIR)/lib$(MODULE).a
-
-# Rule to build a single module's static lib
+# Pattern rule for individual module archives
 $(LIB_DIR)/lib%.a: $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(shell find $(SRC_DIR)/$* -name '*.c'))
 	@mkdir -p $(LIB_DIR)
-	$(AR) $(ARFLAGS) $@ $^
+	@$(AR) $(ARFLAGS) $@ $^
+	@echo -e "\e[38;5;5m"$(AR)"\e[0m  "$(LIB_DIR)" \e[38;5;5->\e[0m "$^
+	@$(RANLIB) $@
+	@echo -e "[\e[38;5;2mOK\e[0m] Built \e[38;5;2m"$@"\e[0m"
 
-# Rule to build each object file
+# Collect all object files from all modules
+ALL_OBJS := $(foreach module,$(MODULES),$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(shell find $(SRC_DIR)/$(module) -name '*.c')))
+
+# Combined super-library (builds individual libs as dependencies but only outputs ccoll.a)
+ccoll: $(ALL_OBJS)
+	@mkdir -p $(LIB_DIR)
+	@$(AR) $(ARFLAGS) $(LIB_DIR)/lib$(NAME).a $^
+	@echo -e "\e[38;5;5m"$(AR)"\e[0m "$(LIB_DIR)" \e[38;5;5m->\e[0m "$^
+	@$(RANLIB) $(LIB_DIR)/lib$(NAME).a
+	@echo -e "[\e[38;5;2mOK\e[0m] Built \e[38;5;2m"$(LIB_DIR)/lib$(NAME).a"\e[0m (\e[38;5;3mMain\e[0m)"
+
+# Compile .c → .o
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo -e "\e[38;5;5m"$(CC)"\e[0m "$<" \e[38;5;5m->\e[0m "$@
 
-# Clean
 clean:
-	rm -rf $(BUILD_DIR)
-	@echo "[✓] Cleaned build artifacts."
+	@rm -rf $(BUILD_DIR)
+	@echo -e "[\e[38;5;2mOK\e[0m] Cleaned all build artifacts"

@@ -31,7 +31,19 @@
  *	Vec_push(vec, t);
  */
 
-#include "../error_codes.h"
+#ifndef CCOLL_ERROR_CODES_H
+#define CCOLL_ERROR_CODES_H
+
+#define CCOLL_SUCCESS 0
+#define CCOLL_ERROR -1
+#define CCOLL_OUT_OF_MEMORY -2
+#define CCOLL_INVALID_ARGUMENT -3
+#define CCOLL_FREED_WITH_ERRORS -4
+#define CCOLL_NOT_ENOUGH_MEMORY_REQUESTED -5
+#define CCOLL_EMPTY -6
+
+#endif
+
 #include <sys/types.h>
 
 #define VEC_MIN_CAPACITY 8
@@ -69,7 +81,6 @@ int Vec_set_destructor(Vec *vec, int (*destructor)(void *));
 // CCOLL_OUT_OF_MEMORY and
 // CCOLL_SUCCESS
 int Vec_reserve(Vec *vec, size_t idxs);
-
 
 // Allocates exact amount of memory as
 // provided
@@ -188,6 +199,9 @@ Vec *Vec_append_clone(Vec *vec1, Vec *vec2);
 // Splits Vec into two separate Vec's at provided
 // index the new_vec variable doesn't need to be
 // initialized
+//
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS,
+// CCOLL_OUT_OF_MEMORY
 int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 
 // Clones Vec and splits that clone into two separate Vec's at specified
@@ -212,5 +226,7 @@ int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity);
 // Appends specified number of elements to Vec keep in mind
 // that you need to provide list of pointer as data pointer
 int Vec_push_range(Vec *vec, void **data, size_t quantity);
+
+int _Vec_realloc_checked(Vec *vec, size_t capacity_target);
 
 #endif
