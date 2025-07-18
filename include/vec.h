@@ -211,10 +211,6 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 // CCOLL_OUT_OF_MEMORY
 int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx);
 
-// Removes every element
-// from the Vec
-int Vec_clear(Vec *vec);
-
 // Removes elements from specified range of the Vec if range
 // is not valid it just ignores it
 int Vec_clear_range(Vec *vec, size_t from_idx, size_t to_idx);
