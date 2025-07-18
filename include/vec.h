@@ -206,6 +206,9 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 
 // Clones Vec and splits that clone into two separate Vec's at specified
 // index new_vec1 and new_vec2 doesn't have to be initialized
+//
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS,
+// CCOLL_OUT_OF_MEMORY
 int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx);
 
 // Removes every element
