@@ -36,11 +36,16 @@
 
 #define CCOLL_SUCCESS 0
 #define CCOLL_ERROR -1
+
 #define CCOLL_OUT_OF_MEMORY -2
+
 #define CCOLL_INVALID_ARGUMENT -3
-#define CCOLL_FREED_WITH_ERRORS -4
-#define CCOLL_NOT_ENOUGH_MEMORY_REQUESTED -5
+#define CCOLL_NOT_ENOUGH_MEMORY_REQUESTED -4
+#define CCOLL_NULL_VEC -5
 #define CCOLL_EMPTY -6
+
+#define CCOLL_DESTRUCTOR_FOO_FAIL -7
+#define CCOLL_DESTRUCTOR_FOO_FAIL_CONTINUED 7
 
 #endif
 
@@ -106,6 +111,25 @@ int Vec_free_shallow(Vec *vec);
 // CCOLL_INVALID_ARGUMENT,
 // CCOLL_SUCCESS
 int Vec_free(Vec *vec);
+
+// Removes elements from specified range of the Vec if range
+// is not valid it just ignores it
+//
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
+int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx);
+
+// Removes element at specified index
+//
+//
+int Vec_free_element(Vec *vec, size_t idx);
+
+// Removes data from specified index of
+// the Vec (Use only if data doesn't have destructor)
+//
+// Can return: CCOLL_SUCCESS,
+// CCOLL_INVALID_ARGUMENT,
+// CCOLL_EMPTY
+int Vec_remove(Vec *vec, size_t idx);
 
 // Frees memory to fit
 // Vec content
@@ -175,14 +199,6 @@ void *Vec_pop_back(Vec *vec);
 // CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
 int Vec_insert(Vec *vec, size_t idx, void *data);
 
-// Removes data from specified index of
-// the Vec
-//
-// Can return: CCOLL_SUCCESS,
-// CCOLL_INVALID_ARGUMENT,
-// CCOLL_EMPTY
-int Vec_remove(Vec *vec, size_t idx);
-
 // Appends Vec with another Vec
 //
 // Can return: CCOLL_SUCCESS,
@@ -210,10 +226,6 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 // Returns: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS,
 // CCOLL_OUT_OF_MEMORY
 int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx);
-
-// Removes elements from specified range of the Vec if range
-// is not valid it just ignores it
-int Vec_clear_range(Vec *vec, size_t from_idx, size_t to_idx);
 
 // Swaps two elements of the Vec
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
