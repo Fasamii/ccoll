@@ -76,7 +76,7 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 
 	int errors = 0;
 	if (vec->destructor) {
-		for (int i = to_idx; i >= from_idx; i--) {
+		for (size_t i = to_idx; i >= from_idx; i--) {
 			if (vec->destructor(vec->data + (i * vec->element_size)))
 				errors++;
 		}
