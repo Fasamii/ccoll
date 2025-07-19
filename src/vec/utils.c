@@ -15,8 +15,8 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx) {
 	if (_Vec_realloc_checked(new_vec, base->size - idx))
 		return CCOLL_OUT_OF_MEMORY;
 
-	if (base->destructor) {
-		new_vec->destructor = base->destructor;
+	if (base->after_element) {
+		new_vec->after_element= base->after_element;
 	}
 
 	memcpy(
@@ -43,9 +43,9 @@ int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx) {
 	if (_Vec_realloc_checked(new_vec2, base->size - idx))
 		return CCOLL_OUT_OF_MEMORY;
 
-	if (base->destructor) {
-		new_vec1->destructor = base->destructor;
-		new_vec2->destructor = base->destructor;
+	if (base->after_element) {
+		new_vec1->after_element= base->after_element;
+		new_vec2->after_element= base->after_element;
 	}
 
 	memcpy(new_vec1->data, base->data, idx * base->element_size);

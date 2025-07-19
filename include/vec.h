@@ -44,8 +44,8 @@
 #define CCOLL_NULL_VEC -5
 #define CCOLL_EMPTY -6
 
-#define CCOLL_DESTRUCTOR_FOO_FAIL -7
-#define CCOLL_DESTRUCTOR_FOO_FAIL_CONTINUED 7
+#define CCOLL_AFTER_FOO_FAIL -7
+#define CCOLL_AFTER_FOO_FAIL_CONTINUED 7
 
 #endif
 
@@ -58,58 +58,39 @@ typedef struct Vec {
 	size_t capacity;
 	size_t element_size;
 	void *data;
-	int (*destructor)(void *element);
+	int (*after_element)(void *element);
 } Vec;
 
-// Initializes Vec structure and
-// returns pointer to it
+// Initializes Vec structure and returns pointer to it
 //
-// no error messages since it returns pointer only NULL
+// Returns: Pointer to Vec, NULL on failure
 Vec *Vec_init(size_t sizeof_data);
 
 // Initializes Vec structure and ensures that its capacity
 // is at least as provided then returns pointer to it
 //
-// No error messages since it returns pointer only NULL
+// Returns: Pointer to Vec, NULL on failure
 Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 
-// Sets the destruktor or cleanup foo for Vec
-// (used within Vec_free())
+// Sets the destruktor or cleanup foo for Vec elements
 //
-// Can return: CCOLL_INVALID_ARGUMENT and CCOLL_SUCCESS
-int Vec_set_destructor(Vec *vec, int (*destructor)(void *));
+// Can return: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
+int Vec_set_after(Vec *vec, int (*after)(void *));
 
-// Makes sure that Vec have enough capacity to
-// store provided size
+// Makes sure that Vec have enough capacity to store number of elements
 //
-// Can return: CCOLL_INVALID_ARGUMENT,
-// CCOLL_OUT_OF_MEMORY and
-// CCOLL_SUCCESS
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
 int Vec_reserve(Vec *vec, size_t idxs);
 
-// Allocates exact amount of memory as
-// provided
+// Allocates amount of memory exactly needed to store provided number of
+// elements
 //
-// Can return:
-// CCOLL_INVALID_ARGUMENT,
-// CCOLL_OUT_OF_MEMORY or
-// CCOLL_SUCCESS
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
 int Vec_alloc(Vec *vec, size_t idxs);
 
-// Frees vec structure leaving
-// its elements
+// Frees Vec structure
 //
-// Can return:
-// CCOLL_INVALID_ARGUMENT,
-// CCOLL_SUCCESS
-int Vec_free_shallow(Vec *vec);
-
-// Frees entire Vec
-// with its elements
-//
-// Can return:
-// CCOLL_INVALID_ARGUMENT,
-// CCOLL_SUCCESS
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
 int Vec_free(Vec *vec);
 
 // Removes elements from specified range of the Vec if range

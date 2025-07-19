@@ -10,10 +10,10 @@ Vec *Vec_init(size_t size_of_data) {
 	Vec *vec = (Vec *)malloc(sizeof(Vec));
 	if (!vec) return NULL;
 
-	vec->size		= 0;
-	vec->element_size = size_of_data;
-	vec->capacity	= VEC_MIN_CAPACITY;
-	vec->destructor	= NULL;
+	vec->size		 = 0;
+	vec->element_size	 = size_of_data;
+	vec->capacity	 = VEC_MIN_CAPACITY;
+	vec->after_element = NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -28,10 +28,10 @@ Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
 	Vec *vec = (Vec *)malloc(sizeof(Vec));
 	if (!vec) return NULL;
 
-	vec->size		= 0;
-	vec->element_size = size_of_data;
-	vec->capacity	= min_capacity;
-	vec->destructor	= NULL;
+	vec->size		 = 0;
+	vec->element_size	 = size_of_data;
+	vec->capacity	 = min_capacity;
+	vec->after_element = NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -42,9 +42,9 @@ Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
 	return vec;
 }
 
-int Vec_set_destructor(Vec *vec, int (*destructor)(void *)) {
+int Vec_set_after_elemet(Vec *vec, int (*after)(void *)) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	vec->destructor = destructor;
+	vec->after_element = after;
 	return CCOLL_SUCCESS;
 }
 
@@ -163,10 +163,10 @@ Vec *Vec_append_clone(Vec *vec1, Vec *vec2) {
 	    vec2->size * vec2->element_size
 	);
 
-	if (vec1->destructor)
-		vec->destructor = vec1->destructor;
-	else if (vec2->destructor)
-		vec->destructor = vec2->destructor;
+	if (vec1->after_element)
+		vec->after_element = vec1->after_element;
+	else if (vec2->after_element)
+		vec->after_element = vec2->after_element;
 
 	vec->size = vec1->size + vec2->size;
 
@@ -220,6 +220,28 @@ int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 
 	memmove(
 	    vec->data + (start_idx * vec->element_size), *data,
+	    quantity * vec->element_size
+	);
+
+	vec->size += quantity;
+
+	return CCOLL_SUCCESS;
+}
+
+int Vec_push_range(Vec *vec, void **data, size_t quantity) {
+	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!*data) return CCOLL_INVALID_ARGUMENT;
+
+	if (quantity == 0) return CCOLL_SUCCESS;
+
+	if (vec->size + quantity > vec->capacity) {
+		if (Vec_reserve(vec, quantity)) return CCOLL_OUT_OF_MEMORY;
+	}
+
+	memmove(
+	    vec->data + (vec->size * vec->element_size), *data,
 	    quantity * vec->element_size
 	);
 
