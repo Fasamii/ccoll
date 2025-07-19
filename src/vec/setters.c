@@ -1,6 +1,5 @@
 #include "../../colors.h"
 #include "../../include/vec.h"
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +13,7 @@ Vec *Vec_init(size_t size_of_data) {
 	vec->size		= 0;
 	vec->element_size = size_of_data;
 	vec->capacity	= VEC_MIN_CAPACITY;
+	vec->destructor	= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -31,6 +31,7 @@ Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
 	vec->size		= 0;
 	vec->element_size = size_of_data;
 	vec->capacity	= min_capacity;
+	vec->destructor	= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -172,3 +173,57 @@ Vec *Vec_append_clone(Vec *vec1, Vec *vec2) {
 	return vec;
 }
 
+int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
+	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!*data) return CCOLL_INVALID_ARGUMENT;
+	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
+
+	if (quantity == 0) return CCOLL_SUCCESS;
+
+	size_t data_replaced = vec->size - start_idx;
+
+	if (start_idx + quantity > vec->capacity) {
+		if (Vec_reserve(vec, quantity - data_replaced))
+			return CCOLL_OUT_OF_MEMORY;
+	}
+
+	memmove(
+	    vec->data + (start_idx * vec->element_size), *data,
+	    quantity * vec->element_size
+	);
+
+	vec->size += quantity - data_replaced;
+
+	return CCOLL_SUCCESS;
+}
+
+int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
+	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!*data) return CCOLL_INVALID_ARGUMENT;
+	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
+
+	if (quantity == 0) return CCOLL_SUCCESS;
+
+	if (vec->size + quantity > vec->capacity) {
+		if (Vec_reserve(vec, quantity)) return CCOLL_OUT_OF_MEMORY;
+	}
+
+	memmove(
+	    vec->data + ((start_idx + quantity) * vec->element_size),
+	    vec->data + (start_idx * vec->element_size),
+	    (vec->size - start_idx) * vec->element_size
+	);
+
+	memmove(
+	    vec->data + (start_idx * vec->element_size), *data,
+	    quantity * vec->element_size
+	);
+
+	vec->size += quantity;
+
+	return CCOLL_SUCCESS;
+}

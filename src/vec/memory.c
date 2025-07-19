@@ -10,7 +10,7 @@ int Vec_reserve(Vec *vec, size_t idxs) {
 	size_t toalloc = vec->size + idxs;
 	if (toalloc <= vec->capacity) return CCOLL_SUCCESS;
 
-	void *tmp_data = realloc(vec->data, (toalloc * vec->element_size));
+	void *tmp_data = (void*) realloc(vec->data, (toalloc * vec->element_size));
 	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
 
 	vec->data	  = tmp_data;
@@ -66,7 +66,6 @@ int Vec_free(Vec *vec) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: that foo
 // TODO:FIX: handle destructor errors better
 int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
@@ -95,7 +94,6 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 }
 
 // TODO:FIX: handle destructor errors better
-// TODO:TEST: that foo
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;

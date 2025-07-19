@@ -13,7 +13,7 @@ RANLIB := ranlib
 CFLAGS := -Wall -Wextra -std=c99 -O2 -I$(INCLUDE_DIR)
 ARFLAGS:= rcs
 
-MODULES := vec llist mmap
+MODULES := vec 
 
 .PHONY: all clean ccoll $(MODULES)
 

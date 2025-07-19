@@ -234,6 +234,9 @@ int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 // list of pointers as data pointer
 int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity);
 
+// Inserts data at specified start_idx of vector
+int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity);
+
 // Appends specified number of elements to Vec keep in mind
 // that you need to provide list of pointer as data pointer
 int Vec_push_range(Vec *vec, void **data, size_t quantity);
