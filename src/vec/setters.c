@@ -36,7 +36,6 @@ int Vec_set(Vec *vec, size_t idx, void *data) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
 int Vec_push(Vec *vec, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -54,7 +53,6 @@ int Vec_push(Vec *vec, void *data) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
 int Vec_push_front(Vec *vec, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -147,11 +145,10 @@ Vec *Vec_append_clone(Vec *vec1, Vec *vec2) {
 }
 
 // TODO:TEST: Make test for that foo
-int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
+int Vec_set_range(Vec *vec, const void *data, size_t start_idx, size_t quantity) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (!*data) return CCOLL_INVALID_ARGUMENT;
 	// TODO: consider making it error when idx is == vec->size
 	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
@@ -165,7 +162,7 @@ int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	}
 
 	memmove(
-	    vec->data + (start_idx * vec->element_size), *data,
+	    vec->data + (start_idx * vec->element_size), data,
 	    quantity * vec->element_size
 	);
 
@@ -204,12 +201,11 @@ int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
-int Vec_push_range(Vec *vec, void **data, size_t quantity) {
+// TODO: read implementation of that foo and apply to rest of range foo's
+int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (!*data) return CCOLL_INVALID_ARGUMENT;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -217,8 +213,8 @@ int Vec_push_range(Vec *vec, void **data, size_t quantity) {
 		if (Vec_reserve(vec, quantity)) return CCOLL_OUT_OF_MEMORY;
 	}
 
-	memmove(
-	    vec->data + (vec->size * vec->element_size), *data,
+	memcpy(
+	    vec->data + (vec->size * vec->element_size), data,
 	    quantity * vec->element_size
 	);
 
@@ -227,15 +223,35 @@ int Vec_push_range(Vec *vec, void **data, size_t quantity) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
+int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
+	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (!data) return CCOLL_INVALID_ARGUMENT;
+
+	if (quantity == 0) return CCOLL_SUCCESS;
+
+	if (vec->size + quantity > vec->capacity) {
+		if (Vec_reserve(vec, quantity)) return CCOLL_OUT_OF_MEMORY;
+	}
+
+	memmove(vec->data + (quantity * vec->element_size), vec->data, vec->size * vec->element_size);
+	memcpy(vec->data, data, quantity * vec->element_size);
+
+	vec->size += quantity;
+
+	return CCOLL_SUCCESS;
+}
+
 int Vec_fill(Vec *vec, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
 
-	for (size_t i = 0; i < vec->size; i++) {
+	for (size_t i = 0; i < vec->capacity; i++) {
 		memmove(vec->data + (i * vec->element_size), data, vec->element_size);
 	}
+
+	vec->size = vec->capacity;
 
 	return CCOLL_SUCCESS;
 }

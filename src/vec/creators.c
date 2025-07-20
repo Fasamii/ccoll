@@ -1,10 +1,11 @@
 #include "../../colors.h"
 #include "../../include/vec.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 
-// TODO:TEST: Make test for that foo
 Vec *Vec_init(size_t size_of_data) {
+	if (size_of_data == 0) return NULL;
 
 	Vec *vec = (Vec *)malloc(sizeof(Vec));
 	if (!vec) return NULL;
@@ -23,8 +24,10 @@ Vec *Vec_init(size_t size_of_data) {
 	return vec;
 }
 
-// TODO:TEST: Make test for that foo
 Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
+	if (size_of_data == 0) return NULL;
+	if (min_capacity == 0) return NULL;
+
 	Vec *vec = (Vec *)malloc(sizeof(Vec));
 	if (!vec) return NULL;
 

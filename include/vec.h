@@ -221,14 +221,15 @@ int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 
 // Sets specified number of elements keep in mind that you have to provide
 // list of pointers as data pointer
-int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity);
+int Vec_set_range(Vec *vec, const void *data, size_t start_idx, size_t quantity);
 
 // Inserts data at specified start_idx of vector
 int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity);
 
 // Appends specified number of elements to Vec keep in mind
 // that you need to provide list of pointer as data pointer
-int Vec_push_range(Vec *vec, void **data, size_t quantity);
+int Vec_push_range(Vec *vec, const void *data, size_t quantity);
+int Vec_push_front_range(Vec *vec, const void *data, size_t quantity);
 
 // Functional fashion foo that takes foo which will be called against all elements of Vec
 //

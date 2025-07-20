@@ -26,3 +26,4 @@ command (that file includes all .a files of collections)
 - [ ] make API more consistent
 - [ ] make get foo's variants like get last and first
 - [ ] refractor the .h files to group similar foo's
+- [ ] make some error logging functionality

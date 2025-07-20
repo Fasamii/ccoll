@@ -12,7 +12,6 @@ void *Vec_get(Vec *vec, size_t idx) {
 	return vec->data + (idx * vec->element_size);
 }
 
-// TODO:TEST: Make test for that foo
 void *Vec_pop(Vec *vec) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
@@ -29,7 +28,6 @@ void *Vec_pop(Vec *vec) {
 	return data;
 }
 
-// TODO:TEST: Make test for that foo
 void *Vec_pop_front(Vec *vec) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
