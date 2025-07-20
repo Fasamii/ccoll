@@ -1,5 +1,6 @@
 #ifndef CCOLL_VEC_H
 #define CCOLL_VEC_H
+
 /*
  * Vec (Vector)
  *
@@ -31,25 +32,25 @@
  *	Vec_push(vec, t);
  */
 
-#ifndef CCOLL_ERROR_CODES_H
-#define CCOLL_ERROR_CODES_H
+// TODO: redo errors
+// TODO: after making other ccoll's make sure that errors are consistent
 
-#define CCOLL_SUCCESS 0
-#define CCOLL_ERROR -1
-
-#define CCOLL_OUT_OF_MEMORY -2
-
-#define CCOLL_INVALID_ARGUMENT -3
-#define CCOLL_NOT_ENOUGH_MEMORY_REQUESTED -4
-#define CCOLL_NULL_VEC -5
-#define CCOLL_EMPTY -6
-
-#define CCOLL_AFTER_FOO_FAIL -7
-#define CCOLL_AFTER_FOO_FAIL_CONTINUED 7
-
-#endif
+// #ifndef CCOLL_ERROR_CODES_H
+// #define CCOLL_ERROR_CODES_H
+//
+// #define CCOLL_SUCCESS 0
+// #define CCOLL_ERROR -1
+// #define CCOLL_INVALID_ARGUMENT -3
+// #define CCOLL_OUT_OF_MEMORY -2
+// #define CCOLL_NOT_ENOUGH_MEMORY_REQUESTED -4
+// #define CCOLL_EMPTY -6
+// #define CCOLL_PASSED_FOO_FAIL -7
+// #define CCOLL_PASSED_FOO_FAIL_CONTINUED 7
+//
+// #endif
 
 #include <sys/types.h>
+#include <stdbool.h>
 
 #define VEC_MIN_CAPACITY 8
 
@@ -57,9 +58,11 @@ typedef struct Vec {
 	size_t size;
 	size_t capacity;
 	size_t element_size;
-	void *data;
 	int (*after_element)(void *element);
+	void *data;
 } Vec;
+
+// TODO: read all Returns: and fix mistakes like not existing anymore errors etc...
 
 // Initializes Vec structure and returns pointer to it
 //
@@ -75,7 +78,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // Sets the destruktor or cleanup foo for Vec elements
 //
 // Can return: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
-int Vec_set_after(Vec *vec, int (*after)(void *));
+int Vec_set_after_fn(Vec *vec, int (*fn)(void *));
 
 // Makes sure that Vec have enough capacity to store number of elements
 //
@@ -163,7 +166,7 @@ void *Vec_pop(Vec *vec);
 //
 // Can return: CCOLL_INVALID_ARGUMENT,
 // CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
-int Vec_push_back(Vec *vec, void *data);
+int Vec_push_front(Vec *vec, void *data);
 
 // Pops data from the beginning of the
 // Vector and returns pointer to it
@@ -172,7 +175,7 @@ int Vec_push_back(Vec *vec, void *data);
 //
 // You should free returned
 // data
-void *Vec_pop_back(Vec *vec);
+void *Vec_pop_front(Vec *vec);
 
 // Inserts data to specified index of the Vec
 //
@@ -190,7 +193,7 @@ int Vec_append(Vec *base, Vec *vec);
 // Creates new Vector from two Vec's
 // provided
 //
-// No error messages since it returns pointer only NULL
+// Returns: pointer to cloned appended vector, NULL on failure
 Vec *Vec_append_clone(Vec *vec1, Vec *vec2);
 
 // Splits Vec into two separate Vec's at provided
@@ -208,6 +211,11 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 // CCOLL_OUT_OF_MEMORY
 int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx);
 
+// Creates slice from provide Vec. Accepts negative indexes
+//
+// Returns: Pointer to slice Vec, NULL on failure
+Vec *Vec_slice(Vec *vec, size_t from_idx, size_t to_idx);
+
 // Swaps two elements of the Vec
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 
@@ -222,6 +230,19 @@ int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity);
 // that you need to provide list of pointer as data pointer
 int Vec_push_range(Vec *vec, void **data, size_t quantity);
 
-int _Vec_realloc_checked(Vec *vec, size_t capacity_target);
+// Functional fashion foo that takes foo which will be called against all elements of Vec
+//
+// Returns: CCOLL_PASSED_FOO_FAIL_CONTINUED, CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
+int Vec_for_each(Vec *vec, int (*fn)(void *element, size_t idx, size_t element_size));
+
+// Functional fashion foo that filters out which elements to clone to new Vec
+//
+// Returns: Vec that was created from filtered elements, NULL on failure	
+Vec *Vec_filter(Vec* vec, bool (*fn)(void *element, size_t idx, size_t element_size));
+
+// Fills Vec with provided value
+//
+// Returns: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
+int Vec_fill(Vec *vec, void *data);
 
 #endif

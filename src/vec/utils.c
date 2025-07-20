@@ -1,22 +1,22 @@
 #include "../../include/vec.h"
+#include "../../ccoll_errors.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
-// temp
-#include <stdio.h>
-
+// TODO:TEST: Make test for that foo
 int Vec_split(Vec *base, Vec *new_vec, size_t idx) {
 	if (!base || !new_vec) return CCOLL_INVALID_ARGUMENT;
 	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
 	if (!base->data) return CCOLL_INVALID_ARGUMENT;
+	if (!new_vec->data) return CCOLL_INVALID_ARGUMENT;
 
 	new_vec->element_size = base->element_size;
 
-	if (_Vec_realloc_checked(new_vec, base->size - idx))
-		return CCOLL_OUT_OF_MEMORY;
+	if (Vec_reserve(new_vec, base->size - idx)) return CCOLL_OUT_OF_MEMORY;
 
 	if (base->after_element) {
-		new_vec->after_element= base->after_element;
+		new_vec->after_element = base->after_element;
 	}
 
 	memcpy(
@@ -24,28 +24,31 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx) {
 	    (base->size - idx) * base->element_size
 	);
 
-	new_vec->size = base->size - idx; // NOTE: depends on base->size
-	base->size = idx; // NOTE: new_vec size is dependent on that so it have to
-				// be set second
+	new_vec->size = base->size - idx;
+	base->size	  = idx;
 
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
+// TODO: consider remaking API in the way that you pass only uninitialized
+// pointer to Vec and foo calls Vec_init_with(new_vecX)
 int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx) {
 	if (!base || !new_vec1 || !new_vec2) return CCOLL_INVALID_ARGUMENT;
 	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
 	if (!base->data) return CCOLL_INVALID_ARGUMENT;
+	if (!new_vec1->data) return CCOLL_INVALID_ARGUMENT;
+	if (!new_vec2->data) return CCOLL_INVALID_ARGUMENT;
 
 	new_vec1->element_size = base->element_size;
 	new_vec2->element_size = base->element_size;
 
-	if (_Vec_realloc_checked(new_vec1, idx)) return CCOLL_OUT_OF_MEMORY;
-	if (_Vec_realloc_checked(new_vec2, base->size - idx))
-		return CCOLL_OUT_OF_MEMORY;
+	if (Vec_reserve(new_vec1, idx)) return CCOLL_OUT_OF_MEMORY;
+	if (Vec_reserve(new_vec2, base->size - idx)) return CCOLL_OUT_OF_MEMORY;
 
 	if (base->after_element) {
-		new_vec1->after_element= base->after_element;
-		new_vec2->after_element= base->after_element;
+		new_vec1->after_element = base->after_element;
+		new_vec2->after_element = base->after_element;
 	}
 
 	memcpy(new_vec1->data, base->data, idx * base->element_size);
@@ -60,6 +63,41 @@ int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
+Vec *Vec_slice(Vec *vec, size_t from_idx, size_t to_idx) {
+	if (!vec) return NULL;
+	if (!vec->data) return NULL;
+	if (from_idx > to_idx) return NULL;
+	if (to_idx >= vec->size) return NULL;
+
+	// TODO: consider removing
+	if ((int)from_idx < 0) from_idx = vec->size + from_idx;
+	if ((int)to_idx < 0) to_idx = vec->size + to_idx;
+
+	size_t slice_size = to_idx - from_idx;
+
+	if (slice_size == 0) {
+		Vec *new = Vec_init(vec->element_size);
+		if (!new) return NULL;
+		if (vec->after_element) new->after_element = vec->after_element;
+		return new;
+	}
+
+	Vec *new = Vec_init_with(vec->element_size, slice_size);
+	if (!new) return NULL;
+	if (vec->after_element) new->after_element = vec->after_element;
+
+	memmove(
+	    new->data, vec->data + (from_idx * vec->element_size),
+	    slice_size * vec->element_size
+	);
+
+	new->size = slice_size;
+
+	return new;
+}
+
+// TODO:TEST: Make test for that foo
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;

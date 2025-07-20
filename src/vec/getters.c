@@ -1,7 +1,9 @@
 #include "../../include/vec.h"
+#include "../../ccoll_errors.h"
 #include <stdlib.h>
 #include <string.h>
 
+// TODO:TEST: Make test for that foo
 void *Vec_get(Vec *vec, size_t idx) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
@@ -10,6 +12,7 @@ void *Vec_get(Vec *vec, size_t idx) {
 	return vec->data + (idx * vec->element_size);
 }
 
+// TODO:TEST: Make test for that foo
 void *Vec_pop(Vec *vec) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
@@ -26,7 +29,8 @@ void *Vec_pop(Vec *vec) {
 	return data;
 }
 
-void *Vec_pop_back(Vec *vec) {
+// TODO:TEST: Make test for that foo
+void *Vec_pop_front(Vec *vec) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
 	if (vec->size < 1) return NULL;
@@ -45,6 +49,7 @@ void *Vec_pop_back(Vec *vec) {
 	return data;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_remove(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;

@@ -21,3 +21,8 @@ want all just include libccoll.a file which you can build with
 make ccoll
 ```
 command (that file includes all .a files of collections)
+# overall TODO's
+- [ ] make for all get variants of foo's pointer and owned version
+- [ ] make API more consistent
+- [ ] make get foo's variants like get last and first
+- [ ] refractor the .h files to group similar foo's

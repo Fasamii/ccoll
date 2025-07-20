@@ -1,57 +1,25 @@
 #include "../../colors.h"
+#include "../../ccoll_errors.h"
 #include "../../include/vec.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
-Vec *Vec_init(size_t size_of_data) {
+// TODO: remove later
+#include <stdio.h>
 
-	Vec *vec = (Vec *)malloc(sizeof(Vec));
-	if (!vec) return NULL;
-
-	vec->size		 = 0;
-	vec->element_size	 = size_of_data;
-	vec->capacity	 = VEC_MIN_CAPACITY;
-	vec->after_element = NULL;
-
-	vec->data = (void *)malloc(vec->capacity * vec->element_size);
-	if (!vec->data) {
-		free(vec);
-		return NULL;
-	}
-
-	return vec;
-}
-
-Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
-	Vec *vec = (Vec *)malloc(sizeof(Vec));
-	if (!vec) return NULL;
-
-	vec->size		 = 0;
-	vec->element_size	 = size_of_data;
-	vec->capacity	 = min_capacity;
-	vec->after_element = NULL;
-
-	vec->data = (void *)malloc(vec->capacity * vec->element_size);
-	if (!vec->data) {
-		free(vec);
-		return NULL;
-	}
-
-	return vec;
-}
-
-int Vec_set_after_elemet(Vec *vec, int (*after)(void *)) {
+// TODO:TEST: Make test for that foo
+int Vec_set_after_fn(Vec *vec, int (*fn)(void *)) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	vec->after_element = after;
+	vec->after_element = fn;
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_set(Vec *vec, size_t idx, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
+	// TODO: consider making it error to have idx == vec->size
 	if (idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (idx == vec->size) {
@@ -68,6 +36,7 @@ int Vec_set(Vec *vec, size_t idx, void *data) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_push(Vec *vec, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -85,7 +54,8 @@ int Vec_push(Vec *vec, void *data) {
 	return CCOLL_SUCCESS;
 }
 
-int Vec_push_back(Vec *vec, void *data) {
+// TODO:TEST: Make test for that foo
+int Vec_push_front(Vec *vec, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
@@ -105,6 +75,7 @@ int Vec_push_back(Vec *vec, void *data) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_insert(Vec *vec, size_t idx, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -127,6 +98,7 @@ int Vec_insert(Vec *vec, size_t idx, void *data) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_append(Vec *base, Vec *vec) {
 	if (!base || !vec) return CCOLL_INVALID_ARGUMENT;
 	if (!base->data || !vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -149,6 +121,7 @@ int Vec_append(Vec *base, Vec *vec) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 Vec *Vec_append_clone(Vec *vec1, Vec *vec2) {
 	if (!vec1 || !vec2) return NULL;
 	if (!vec1->data || !vec2->data) return NULL;
@@ -173,11 +146,13 @@ Vec *Vec_append_clone(Vec *vec1, Vec *vec2) {
 	return vec;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
 	if (!*data) return CCOLL_INVALID_ARGUMENT;
+	// TODO: consider making it error when idx is == vec->size
 	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
@@ -199,6 +174,7 @@ int Vec_set_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -228,6 +204,7 @@ int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_push_range(Vec *vec, void **data, size_t quantity) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -246,6 +223,19 @@ int Vec_push_range(Vec *vec, void **data, size_t quantity) {
 	);
 
 	vec->size += quantity;
+
+	return CCOLL_SUCCESS;
+}
+
+// TODO:TEST: Make test for that foo
+int Vec_fill(Vec *vec, void *data) {
+	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (!data) return CCOLL_INVALID_ARGUMENT;
+
+	for (size_t i = 0; i < vec->size; i++) {
+		memmove(vec->data + (i * vec->element_size), data, vec->element_size);
+	}
 
 	return CCOLL_SUCCESS;
 }

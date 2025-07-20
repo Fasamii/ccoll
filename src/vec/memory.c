@@ -1,8 +1,11 @@
 #include "../../include/vec.h"
+#include "../../ccoll_errors.h"
 #include <stdatomic.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
+// TODO:TEST: Make test for that foo
 int Vec_reserve(Vec *vec, size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -20,6 +23,7 @@ int Vec_reserve(Vec *vec, size_t idxs) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_alloc(Vec *vec, size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -34,38 +38,34 @@ int Vec_alloc(Vec *vec, size_t idxs) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO: FIX: find better way to handle errors in destructor for that foo
-// make it more recoverable and return more data about error e.g.: what was
-// actually freed. Or return Vec with indexes where destructor failed, think
-// about that
-// TODO: make that fallback to free(vec->data[idx]) if no destructor foo
+// TODO:TEST: Make test for that foo
 int Vec_free(Vec *vec) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 
-	size_t errors_count = 0;
+	size_t errors = 0;
 	if (vec->after_element) {
 		for (size_t i = 0; i < vec->size; i++) {
 			if (vec->after_element(vec->data + (i * vec->element_size)))
-				errors_count++;
+				errors++;
 		}
 	}
 
 	free(vec->data);
 	free(vec);
 
-	if (errors_count > 0) return CCOLL_AFTER_FOO_FAIL_CONTINUED;
+	if (errors > 0) return CCOLL_PASSED_FOO_FAIL_CONTINUED;
 	return CCOLL_SUCCESS;
 }
 
-// TODO:FIX: handle destructor errors better
+// TODO:TEST: Make test for that foo
 int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (from_idx > to_idx) return CCOLL_INVALID_ARGUMENT;
 	if (to_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
-	int errors = 0;
+	size_t errors = 0;
 	if (vec->after_element) {
 		for (size_t i = to_idx; i >= from_idx; i--) {
 			if (vec->after_element(vec->data + (i * vec->element_size)))
@@ -81,11 +81,11 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 
 	vec->size -= (to_idx - from_idx);
 
-	if (errors) return CCOLL_AFTER_FOO_FAIL_CONTINUED;
+	if (errors) return CCOLL_PASSED_FOO_FAIL_CONTINUED;
 	return CCOLL_SUCCESS;
 }
 
-// TODO:FIX: handle destructor errors better
+// TODO:TEST: Make test for that foo
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -93,7 +93,7 @@ int Vec_free_element(Vec *vec, size_t idx) {
 
 	if (vec->after_element) {
 		if (vec->after_element(vec->data + (idx * vec->element_size)))
-			return CCOLL_AFTER_FOO_FAIL;
+			return CCOLL_PASSED_FOO_FAIL;
 	}
 
 	memmove(
@@ -107,6 +107,7 @@ int Vec_free_element(Vec *vec, size_t idx) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_shrink(Vec *vec) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -119,6 +120,7 @@ int Vec_shrink(Vec *vec) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:TEST: Make test for that foo
 int Vec_shrink_to(Vec *vec, size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
