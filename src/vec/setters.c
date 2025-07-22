@@ -7,19 +7,16 @@
 // TODO: remove later
 #include <stdio.h>
 
-// TODO:TEST: Make test for that foo
-int Vec_set_after_fn(Vec *vec, int (*fn)(void *)) {
+int Vec_set_after_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	vec->after_element = fn;
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
 int Vec_set(Vec *vec, size_t idx, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
-	// TODO: consider making it error to have idx == vec->size
 	if (idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (idx == vec->size) {
@@ -73,7 +70,6 @@ int Vec_push_front(Vec *vec, void *data) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
 int Vec_insert(Vec *vec, size_t idx, void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -96,7 +92,6 @@ int Vec_insert(Vec *vec, size_t idx, void *data) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
 int Vec_append(Vec *base, Vec *vec) {
 	if (!base || !vec) return CCOLL_INVALID_ARGUMENT;
 	if (!base->data || !vec->data) return CCOLL_INVALID_ARGUMENT;

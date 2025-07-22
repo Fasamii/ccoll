@@ -202,12 +202,199 @@ void TEST_fill(size_t size) {
 
 	double *first = (double *)Vec_pop_front(vec);
 	if (size == 1) {
-		assert_eq(first == NULL, "If you pop'ed only existing element second pop should return NULL");
+		assert_eq(
+		    first == NULL, "If you pop'ed only existing element second pop "
+					 "should return NULL"
+		);
 		return;
 	}
 	assert_eq(
 	    *first == number, "Vec_pop_front() & Vec_fill() with size:%ld", size
 	);
+}
+
+int CALLBACK_after_element(void *element, size_t element_size) {
+	log("CALLBACK_after_element() foo with data %s", (char *)element);
+	return 0;
+}
+
+void TEST_after_element(size_t size, int (*fn)(void *, size_t element_size)) {
+	Vec *vec = Vec_init_with((size + 1) * sizeof(char), size);
+	if (vec == NULL) return;
+	Vec_set_after_callback(vec, fn);
+
+	char *str = (char *)malloc((size + 1) * sizeof(char));
+	generate_random_string(str, size);
+
+	Vec_fill(vec, str);
+
+	Vec_free(vec);
+	return;
+}
+
+// Covers: Vec_set()
+void TEST_vec_set() {
+	Vec *vec  = Vec_init(sizeof(int));
+	int data1 = 12;
+	int data2 = 28;
+	int res;
+
+	res = Vec_set(vec, 1, &data1);
+	assert_eq(
+	    res == CCOLL_INVALID_ARGUMENT,
+	    "That operation would leave gap in data structure so Vec_set() "
+	    "returns error"
+	);
+	assert_eq(
+	    vec->size == 0, "just to check if it for sure din't set that data"
+	);
+
+	res = Vec_set(vec, 0, &data1);
+	assert_eq(
+	    res == CCOLL_SUCCESS,
+	    "Vec_set() should prepend data if there isnt any and idx is 0"
+	);
+	assert_eq(
+	    vec->size == 1, "just to check if it for sure added pthat data"
+	);
+	assert_eq(*(int *)vec->data == data1, "the data should be %i", data1);
+
+	res = Vec_set(vec, 0, &data2);
+	assert_eq(res == CCOLL_SUCCESS, "Vec_set() successful");
+	assert_eq(vec->size == 1, "Just a check");
+	assert_eq(*(int *)vec->data == data2, "the data should be %i", data2);
+
+	res = Vec_set(vec, 2, &data1);
+	assert_eq(
+	    res == CCOLL_INVALID_ARGUMENT,
+	    "That operation would leave gap in data structure so Vec_set() "
+	    "returns error"
+	);
+	assert_eq(
+	    vec->size == 1, "just to check if it for sure din't set that data"
+	);
+}
+
+int CALLBACK_vec_insert(void *data, size_t element_size) {
+	log("size of data is %ld and data is (%ld)", element_size, *(long *)data);
+	return CCOLL_SUCCESS;
+}
+
+// Covers: Vec_get(), Vec_insert(), Vec_set_after_callback(), Vec_free()
+void TEST_vec_insert() {
+	Vec *vec   = Vec_init(sizeof(long));
+	long data1 = 123123;
+	long data2 = 8888888;
+	long data3 = 9;
+	int res;
+
+	res = Vec_insert(vec, 1, &data1);
+	assert_eq(
+	    res == CCOLL_INVALID_ARGUMENT,
+	    "the idx to Vec_insert() is intentionally invalid"
+	);
+	assert_eq(vec->size == 0, "Validation that vec didnt growth");
+
+	res = Vec_insert(vec, 0, &data1);
+	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
+	assert_eq(
+	    *(long *)Vec_get(vec, 0) == data1,
+	    "Validation check if data is correct (%ld)", *(long *)Vec_get(vec, 0)
+	);
+
+	res = Vec_insert(vec, 0, &data2);
+	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
+	assert_eq(
+	    *(long *)Vec_get(vec, 0) == data2,
+	    "Validation check if data is correct (%ld)", *(long *)Vec_get(vec, 0)
+	);
+
+	res = Vec_insert(vec, 1, &data3);
+	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
+	assert_eq(
+	    *(long *)Vec_get(vec, 1) == data3,
+	    "Validation check if data is correct (%ld)", *(long *)Vec_get(vec, 1)
+	);
+
+	Vec_shrink(vec);
+
+	assert_eq(*(long *)Vec_get(vec, 0) == data2, "Data integrity check");
+	assert_eq(*(long *)Vec_get(vec, 1) == data3, "Data integrity check");
+	assert_eq(*(long *)Vec_get(vec, 2) == data1, "Data integrity check");
+
+	Vec_set_after_callback(vec, CALLBACK_vec_insert);
+	Vec_free(vec);
+}
+
+void TEST_vec_append(size_t size1, size_t size2) {
+	log("Vec_append() for size1 %ld and size2 %ld", size1, size2);
+	Vec *vecint1  = Vec_init_with(sizeof(int), size1);
+	Vec *vecint2  = Vec_init_with(sizeof(int), size2);
+	Vec *vecchar1 = Vec_init_with(sizeof(char), size1);
+	Vec *vecchar2 = Vec_init_with(sizeof(char), size2);
+	Vec *veclong  = Vec_init_with(sizeof(long), size1);
+
+	if (!vecint1 || !vecint2 || !vecchar1 || !vecchar2 || !veclong) return;
+
+	int ai  = 1;
+	int bi  = 2;
+	char ac = 'a';
+	char bc = 'b';
+	long al = 2323423423;
+
+	Vec_fill(vecint1, &ai);
+	Vec_fill(vecint2, &bi);
+	Vec_fill(vecchar1, &ac);
+	Vec_fill(vecchar2, &bc);
+	Vec_fill(veclong, &al);
+
+	int res;
+
+	res = Vec_append(vecint1, veclong);
+	assert_eq(res == CCOLL_INVALID_ARGUMENT, "Incompatybile vec types");
+	assert_eq(vecint1->size == size1, "Safety check for size");
+	assert_eq(veclong->size == size1, "Safety check for size");
+
+	res = Vec_append(vecint1, vecint1);
+	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
+	assert_eq(vecint1->size == (size1 + size1), "Safety check for size");
+	assert_eq(
+	    (*(int *)Vec_get(vecint1, 0) == ai) &&
+		  (*(int *)Vec_get(vecint1, size1) == ai),
+	    "data integrity check"
+	);
+
+	res = Vec_append(vecchar2, vecchar1);
+	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
+	assert_eq(vecchar2->size == (size1 + size2), "Safety check for size");
+	// FIXME: that check is broken of Vec_append() is broken
+	assert_eq(
+	    (*(int *)Vec_get(vecchar2, 0) == ai) &&
+		  (*(int *)Vec_get(vecchar2, size2) == bi),
+	    "data integrity check"
+	);
+
+	res = Vec_append(vecint1, vecint2);
+	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
+	assert_eq(
+	    vecint1->size == (size1 + size2 + size2), "Safety check for size"
+	);
+	assert_eq(
+	    (*(int *)Vec_get(vecint1, 0) == ai) &&
+		  (*(int *)Vec_get(vecint1, size1 + size1) == bi),
+	    "data integrity check"
+	);
+
+	res = Vec_append(veclong, veclong);
+	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
+	assert_eq(veclong->size == (size1 + size1), "Safety check for size");
+	assert_eq(
+	    (*(int *)Vec_get(veclong, 0) == al) &&
+		  (*(int *)Vec_get(veclong, size1) == al),
+	    "data integrity check"
+	);
+
+	return;
 }
 
 int main(void) {
@@ -236,6 +423,23 @@ int main(void) {
 	TEST_fill(300);
 	TEST_fill(12900);
 	TEST_fill(90000023);
+	section("After Callback : (\e[38;5;1mManula check needed\e[0m)");
+	TEST_after_element(0, CALLBACK_after_element);
+	TEST_after_element(1, CALLBACK_after_element);
+	TEST_after_element(2, CALLBACK_after_element);
+	TEST_after_element(3, CALLBACK_after_element);
+	TEST_after_element(10, CALLBACK_after_element);
+	section("Set");
+	TEST_vec_set();
+	section("Insert");
+	TEST_vec_insert();
+	section("Append");
+	TEST_vec_append(0, 33);
+	TEST_vec_append(0, 0);
+	TEST_vec_append(12, 0);
+	TEST_vec_append(12, 33);
+	TEST_vec_append(22, 93);
+	TEST_vec_append(912, 3003);
 
 	printf("\n");
 	return 0;

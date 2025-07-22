@@ -58,7 +58,7 @@ typedef struct Vec {
 	size_t size;
 	size_t capacity;
 	size_t element_size;
-	int (*after_element)(void *element);
+	int (*after_element)(void *data, size_t element_size);
 	void *data;
 } Vec;
 
@@ -78,7 +78,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // Sets the destruktor or cleanup foo for Vec elements
 //
 // Can return: CCOLL_INVALID_ARGUMENT, CCOLL_SUCCESS
-int Vec_set_after_fn(Vec *vec, int (*fn)(void *));
+int Vec_set_after_callback(Vec *vec, int (*fn)(void *, size_t element_size));
 
 // Makes sure that Vec have enough capacity to store number of elements
 //
