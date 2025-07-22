@@ -44,9 +44,9 @@ int Vec_free(Vec *vec) {
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 
 	size_t errors = 0;
-	if (vec->after_element) {
+	if (vec->after_rm) {
 		for (size_t i = 0; i < vec->size; i++) {
-			if (vec->after_element(
+			if (vec->after_rm(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;
@@ -68,9 +68,9 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (to_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	size_t errors = 0;
-	if (vec->after_element) {
+	if (vec->after_rm) {
 		for (size_t i = to_idx; i >= from_idx; i--) {
-			if (vec->after_element(
+			if (vec->after_rm(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;
@@ -89,14 +89,16 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	return CCOLL_SUCCESS;
 }
 
+// TODO:FIX: make that actually free the size of one element
 // TODO:TEST: Make test for that foo
+// TODO: make foo fail continued
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (idx >= vec->size) return CCOLL_INVALID_ARGUMENT;
 
-	if (vec->after_element) {
-		if (vec->after_element(vec->data + (idx * vec->element_size), vec->element_size))
+	if (vec->after_rm) {
+		if (vec->after_rm(vec->data + (idx * vec->element_size), vec->element_size))
 			return CCOLL_PASSED_FOO_FAIL;
 	}
 
@@ -111,7 +113,6 @@ int Vec_free_element(Vec *vec, size_t idx) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: Make test for that foo
 int Vec_shrink(Vec *vec) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;

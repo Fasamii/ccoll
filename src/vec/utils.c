@@ -1,5 +1,5 @@
-#include "../../include/vec.h"
 #include "../../ccoll_errors.h"
+#include "../../include/vec.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -15,8 +15,8 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx) {
 
 	if (Vec_reserve(new_vec, base->size - idx)) return CCOLL_OUT_OF_MEMORY;
 
-	if (base->after_element) {
-		new_vec->after_element = base->after_element;
+	if (base->after_rm) {
+		new_vec->after_rm = base->after_rm;
 	}
 
 	memcpy(
@@ -46,9 +46,9 @@ int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx) {
 	if (Vec_reserve(new_vec1, idx)) return CCOLL_OUT_OF_MEMORY;
 	if (Vec_reserve(new_vec2, base->size - idx)) return CCOLL_OUT_OF_MEMORY;
 
-	if (base->after_element) {
-		new_vec1->after_element = base->after_element;
-		new_vec2->after_element = base->after_element;
+	if (base->after_rm) {
+		new_vec1->after_rm = base->after_rm;
+		new_vec2->after_rm = base->after_rm;
 	}
 
 	memcpy(new_vec1->data, base->data, idx * base->element_size);
@@ -79,13 +79,13 @@ Vec *Vec_slice(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (slice_size == 0) {
 		Vec *new = Vec_init(vec->element_size);
 		if (!new) return NULL;
-		if (vec->after_element) new->after_element = vec->after_element;
+		if (vec->after_rm) new->after_rm = vec->after_rm;
 		return new;
 	}
 
 	Vec *new = Vec_init_with(vec->element_size, slice_size);
 	if (!new) return NULL;
-	if (vec->after_element) new->after_element = vec->after_element;
+	if (vec->after_rm) new->after_rm = vec->after_rm;
 
 	memmove(
 	    new->data, vec->data + (from_idx * vec->element_size),

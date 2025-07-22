@@ -222,7 +222,7 @@ int CALLBACK_after_element(void *element, size_t element_size) {
 void TEST_after_element(size_t size, int (*fn)(void *, size_t element_size)) {
 	Vec *vec = Vec_init_with((size + 1) * sizeof(char), size);
 	if (vec == NULL) return;
-	Vec_set_after_callback(vec, fn);
+	Vec_set_after_rm_callback(vec, fn);
 
 	char *str = (char *)malloc((size + 1) * sizeof(char));
 	generate_random_string(str, size);
@@ -325,7 +325,7 @@ void TEST_vec_insert() {
 	assert_eq(*(long *)Vec_get(vec, 1) == data3, "Data integrity check");
 	assert_eq(*(long *)Vec_get(vec, 2) == data1, "Data integrity check");
 
-	Vec_set_after_callback(vec, CALLBACK_vec_insert);
+	Vec_set_after_rm_callback(vec, CALLBACK_vec_insert);
 	Vec_free(vec);
 }
 
@@ -457,6 +457,10 @@ void TEST_vec_set_range(size_t size) {
 	assert_eq(
 	    *(char *)Vec_get(vec, size) == data[0], "Additional data validation 2"
 	);
+
+	// for (size_t i = 0; i < vec->size; i++) {
+	// 	printf("Vec:%ld:%c\n", i,  *(char*)Vec_get(vec, i));
+	// }
 
 	Vec_free(vec);
 

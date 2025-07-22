@@ -33,7 +33,7 @@ Vec *Vec_filter(
 	    vec->element_size, vec->size > 16 ? vec->size / 2 : vec->size
 	);
 	if (!new) return NULL;
-	if (vec->after_element) new->after_element = vec->after_element;
+	if (vec->after_rm) new->after_rm = vec->after_rm;
 
 	for (size_t i = 0; i < vec->size; i++) {
 		if (fn(vec->data + (i * vec->element_size), i, vec->element_size)) {

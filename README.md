@@ -30,3 +30,4 @@ make all # build's all .a files
 - [ ] make get foo's have variants like get last and first
 - [ ] rewrite the .h files to group similar foo's and make better explanations
 - [ ] make some error logging functionality that can be disabled in build time
+- [ ] fix after_rm foo functionality and make vec call it on every element removal

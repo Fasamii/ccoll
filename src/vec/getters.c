@@ -54,6 +54,10 @@ int Vec_remove(Vec *vec, size_t idx) {
 	if (vec->size < 1) return CCOLL_EMPTY;
 	if (idx >= vec->size) return CCOLL_INVALID_ARGUMENT;
 
+	if (vec->after_rm) {
+
+	}
+
 	memmove(
 	    vec->data + (idx * vec->element_size),
 	    vec->data + ((idx + 1) * vec->element_size),
@@ -64,3 +68,5 @@ int Vec_remove(Vec *vec, size_t idx) {
 
 	return CCOLL_SUCCESS;
 }
+
+// TODO: make vec remove range

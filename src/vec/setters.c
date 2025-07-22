@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-int Vec_set_after_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
+int Vec_set_after_rm_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	vec->after_element = fn;
+	vec->after_rm= fn;
 	return CCOLL_SUCCESS;
 }
 
@@ -126,10 +126,10 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	    vec2->size * vec2->element_size
 	);
 
-	if (vec1->after_element)
-		vec->after_element = vec1->after_element;
-	else if (vec2->after_element)
-		vec->after_element = vec2->after_element;
+	if (vec1->after_rm)
+		vec->after_rm= vec1->after_rm;
+	else if (vec2->after_rm)
+		vec->after_rm= vec2->after_rm;
 
 	vec->size = vec1->size + vec2->size;
 
@@ -164,11 +164,10 @@ int Vec_set_range(
 }
 
 // TODO:TEST: Make test for that foo
-int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
+int Vec_insert_range(Vec *vec, const void *data, const size_t start_idx, const size_t quantity) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (!*data) return CCOLL_INVALID_ARGUMENT;
 	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
@@ -184,7 +183,7 @@ int Vec_insert_range(Vec *vec, void **data, size_t start_idx, size_t quantity) {
 	);
 
 	memmove(
-	    vec->data + (start_idx * vec->element_size), *data,
+	    vec->data + (start_idx * vec->element_size), data,
 	    quantity * vec->element_size
 	);
 
