@@ -13,14 +13,17 @@ e.g.:
 make vec 
 ```
 # How to use
-you have to #include .h files from include directory of the project in C program. Each
-collection have its own .h file
-then you have to build your project including in CC command .a file of used collections or if you
-want all just include libccoll.a file which you can build with 
+1. you have to #include .h file from ccoll/include/(collection name).h in your program. Each
+collection have its own .h file.
+2. then you have to build your project including in CC command .a file from ccoll/build/lib/ of used collections or if you
+want all just include ccoll/build/lib/libccoll.a file which you can build with 
 ```bash
-make ccoll
+make ccoll # build's main libccoll.a file
 ```
-command (that file includes all .a files of collections)
+or
+```bash
+make all # build's all .a files
+```
 # overall TODO's
 - [ ] make for all get variants of foo's pointer and owned version
 - [ ] make API more consistent
