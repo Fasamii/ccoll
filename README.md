@@ -16,7 +16,7 @@ make vec
 1. you have to #include .h file from ccoll/include/(collection name).h in your program. Each
 collection have its own .h file
 2. then you have to build your project including in CC command .a file from ccoll/build/lib/ of used collections or if you
-want all just include ccoll/build/lib/libccoll.a file which you can build with 
+want all just include ccoll/build/lib/libccoll.a file which contains all .a files, you can build it with 
 ```bash
 make ccoll # build's main libccoll.a file
 ```
