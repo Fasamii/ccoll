@@ -4,7 +4,7 @@
 #include <string.h>
 
 // TODO:TEST: Make test for that foo
-void *Vec_get(Vec *vec, size_t idx) {
+void *Vec_get(const Vec *vec, const size_t idx) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
 	if (idx >= vec->size) return NULL;

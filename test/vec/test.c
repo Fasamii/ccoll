@@ -214,7 +214,8 @@ void TEST_fill(size_t size) {
 }
 
 int CALLBACK_after_element(void *element, size_t element_size) {
-	log("CALLBACK_after_element() foo with data %s", (char *)element);
+	log("CALLBACK_after_element() foo with data %s of size (%ld)",
+	    (char *)element, element_size);
 	return 0;
 }
 
@@ -276,7 +277,9 @@ void TEST_vec_set() {
 }
 
 int CALLBACK_vec_insert(void *data, size_t element_size) {
-	log("size of data is %ld and data is (%ld)", element_size, *(long *)data);
+	log("size of data is " BLU "%ld" NOCOL " and data is (" BLU "%ld" NOCOL
+	    ")",
+	    element_size, *(long *)data);
 	return CCOLL_SUCCESS;
 }
 
@@ -397,6 +400,66 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	    "data integrity check"
 	);
 
+	Vec_free(vecint1);
+	Vec_free(vecint2);
+	Vec_free(vecchar1);
+	Vec_free(vecchar2);
+	Vec_free(veclong);
+
+	return;
+}
+
+// Covers: Vec_set_range(), Vec_get()
+void TEST_vec_set_range(size_t size) {
+	log("running with size:%ld", size);
+	Vec *vec = Vec_init_with(sizeof(char), size);
+	if (vec == NULL) return;
+
+	char *data = malloc((size + 1) * sizeof(char));
+	generate_random_string(data, size);
+
+	int res;
+
+	res = Vec_set_range(vec, data, 1, size);
+	assert_eq(
+	    res == CCOLL_INVALID_ARGUMENT,
+	    "Passed invalid values, should return errror"
+	);
+	assert_eq(vec->size == 0, "Additional check if vec size is valid");
+	assert_eq(*(char *)vec->data != data[0], "Additional data validation");
+
+	res = Vec_set_range(vec, data, 0, 0);
+	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
+	assert_eq(vec->size == 0, "But vec size should be 0");
+	assert_eq(*(char *)vec->data != data[0], "Additional data validation");
+
+	if (size > 1) {
+		res = Vec_set_range(vec, data, 0, size / 2);
+		assert_eq(res == CCOLL_SUCCESS, "should be succesful");
+		assert_eq(vec->size == (size / 2), "checking size of the vec");
+		assert_eq(
+		    *(char *)Vec_get(vec, 0) == data[0],
+		    "Additional data validation"
+		);
+	}
+
+	res = Vec_set_range(vec, data, 0, size);
+	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
+	assert_eq(vec->size == size, "size should be equal to %ld", size);
+	assert_eq(*(char *)vec->data == data[0], "Additional data validation");
+
+	res = Vec_set_range(vec, data, size, size);
+	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
+	assert_eq(vec->size == size + size, "size should be equal to %ld", size);
+	assert_eq(
+	    *(char *)Vec_get(vec, 0) == data[0], "Additional data validation 1"
+	);
+	assert_eq(
+	    *(char *)Vec_get(vec, size) == data[0], "Additional data validation 2"
+	);
+
+	Vec_free(vec);
+
 	return;
 }
 
@@ -442,6 +505,11 @@ int main(void) {
 	TEST_vec_append(12, 0);
 	TEST_vec_append(12, 33);
 	TEST_vec_append(94234234, 99933);
+	section("Set range");
+	TEST_vec_set_range(0);
+	TEST_vec_set_range(1);
+	TEST_vec_set_range(100);
+	TEST_vec_set_range(990090);
 
 	printf("\n");
 	return 0;

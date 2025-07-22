@@ -137,20 +137,27 @@ int Vec_shrink_to(Vec *vec, size_t size);
 //
 // Can return: CCOLL_INVALID_ARGUMENT,
 // CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
-int Vec_set(Vec *vec, size_t idx, void *data);
+int Vec_set(Vec *vec, const size_t idx, const void *data);
 
 // Returns pointer to data at
 // specified Vec index
 //
 // No error messages since it returns pointer only NULL
-void *Vec_get(Vec *vec, size_t idx);
+void *Vec_get(const Vec *vec, const size_t idx);
 
 // Pushes data to the end of Vector
 //
 // Can return: CCOLL_SUCCESS,
 // CCOLL_INVALID_ARGUMENT,
 // CCOLL_OUT_OF_MEMORY
-int Vec_push(Vec *vec, void *data);
+int Vec_push(Vec *vec, const void *data);
+
+// Pushes data to the beginning of the
+// Vec
+//
+// Can return: CCOLL_INVALID_ARGUMENT,
+// CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
+int Vec_push_front(Vec *vec, const void *data);
 
 // Pops data from the
 // end of Vector and
@@ -160,13 +167,6 @@ int Vec_push(Vec *vec, void *data);
 //
 // You should free returned data
 void *Vec_pop(Vec *vec);
-
-// Pushes data to the beginning of the
-// Vec
-//
-// Can return: CCOLL_INVALID_ARGUMENT,
-// CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
-int Vec_push_front(Vec *vec, void *data);
 
 // Pops data from the beginning of the
 // Vector and returns pointer to it
@@ -181,20 +181,20 @@ void *Vec_pop_front(Vec *vec);
 //
 // Can return: CCOLL_INVALID_ARGUMENT,
 // CCOLL_OUT_OF_MEMORY, CCOLL_SUCCESS
-int Vec_insert(Vec *vec, size_t idx, void *data);
+int Vec_insert(Vec *vec, const size_t idx, const void *data);
 
 // Appends Vec with another Vec
 //
 // Can return: CCOLL_SUCCESS,
 // CCOLL_INVALID_ARGUMENT,
 // CCOLL_OUT_OF_MEMORY
-int Vec_append(Vec *base, Vec *vec);
+int Vec_append(Vec *base, const Vec *vec);
 
 // Creates new Vector from two Vec's
 // provided
 //
 // Returns: pointer to cloned appended vector, NULL on failure
-Vec *Vec_append_clone(Vec *vec1, Vec *vec2);
+Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 
 // Splits Vec into two separate Vec's at provided
 // index the new_vec variable doesn't need to be

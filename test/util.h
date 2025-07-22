@@ -22,7 +22,9 @@
 		} else {                                                           \
 			fprintf(                                                     \
 			    stdout,                                                  \
-			    YEL "Assert_eq" NOCOL "::" GRN "Success" NOCOL "::"      \
+			    YEL "Assert_eq" NOCOL "::" GRN "Success" NOCOL "::" BLU  \
+				  "%d" NOCOL ":",                                      \
+			    __LINE__                                                 \
 			);                                                           \
 			fprintf(stdout, msg, ##__VA_ARGS__);                         \
 			fprintf(stdout, "\n");                                       \
