@@ -367,17 +367,20 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	res = Vec_append(vecchar2, vecchar1);
 	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
 	assert_eq(vecchar2->size == (size1 + size2), "Safety check for size");
-	// FIXME: that check is broken of Vec_append() is broken
 	assert_eq(
-	    (*(int *)Vec_get(vecchar2, 0) == ai) &&
-		  (*(int *)Vec_get(vecchar2, size2) == bi),
+	    (*(char *)Vec_get(vecchar2, 0) == bc) &&
+		  (*(char *)Vec_get(vecchar2, size2) == ac),
 	    "data integrity check"
 	);
+
+	Vec_shrink(vecint1);
+	Vec_shrink(vecint2);
+	Vec_shrink(vecchar2);
 
 	res = Vec_append(vecint1, vecint2);
 	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
 	assert_eq(
-	    vecint1->size == (size1 + size2 + size2), "Safety check for size"
+	    vecint1->size == (size1 + size1 + size2), "Safety check for size"
 	);
 	assert_eq(
 	    (*(int *)Vec_get(vecint1, 0) == ai) &&
@@ -389,8 +392,8 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
 	assert_eq(veclong->size == (size1 + size1), "Safety check for size");
 	assert_eq(
-	    (*(int *)Vec_get(veclong, 0) == al) &&
-		  (*(int *)Vec_get(veclong, size1) == al),
+	    (*(long *)Vec_get(veclong, 0) == al) &&
+		  (*(long *)Vec_get(veclong, size1) == al),
 	    "data integrity check"
 	);
 
@@ -438,8 +441,7 @@ int main(void) {
 	TEST_vec_append(0, 0);
 	TEST_vec_append(12, 0);
 	TEST_vec_append(12, 33);
-	TEST_vec_append(22, 93);
-	TEST_vec_append(912, 3003);
+	TEST_vec_append(94234234, 99933);
 
 	printf("\n");
 	return 0;

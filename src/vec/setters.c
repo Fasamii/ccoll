@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: remove later
-#include <stdio.h>
-
 int Vec_set_after_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	vec->after_element = fn;

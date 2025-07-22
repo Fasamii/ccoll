@@ -1,5 +1,5 @@
-#include "../../include/vec.h"
 #include "../../ccoll_errors.h"
+#include "../../include/vec.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -37,8 +37,10 @@ Vec *Vec_filter(
 
 	for (size_t i = 0; i < vec->size; i++) {
 		if (fn(vec->data + (i * vec->element_size), i, vec->element_size)) {
-			// TODO: make error checking here
-			Vec_push(new, vec->data + (i * vec->element_size));
+			if (Vec_push(new, vec->data + (i * vec->element_size))) {
+				Vec_free(new);
+				return NULL;
+			};
 		}
 	}
 
