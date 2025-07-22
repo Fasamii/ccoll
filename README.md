@@ -25,8 +25,8 @@ or
 make all # build's all .a files
 ```
 # overall TODO's
-- [ ] make for all get variants of foo's pointer and owned version
+- [ ] write implementation of: linked list, ring linked list, ring vec, queue, stack
 - [ ] make API more consistent
-- [ ] make get foo's variants like get last and first
-- [ ] refractor the .h files to group similar foo's
-- [ ] make some error logging functionality
+- [ ] make get foo's have variants like get last and first
+- [ ] rewrite the .h files to group similar foo's and make better explanations
+- [ ] make some error logging functionality that can be disabled in build time
