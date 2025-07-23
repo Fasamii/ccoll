@@ -15,5 +15,6 @@
 #define CCOLL_PASSED_FOO_FAIL -7
 #define CCOLL_PASSED_FOO_FAIL_CONTINUED 7
 
+#define CCOLL_OVERFLOW -8
 
 #endif

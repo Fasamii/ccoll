@@ -1,5 +1,6 @@
 #include "../../colors.h"
 #include "../../include/vec.h"
+#include "../../ccoll_errors.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -43,4 +44,12 @@ Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
 	}
 
 	return vec;
+}
+
+// TODO: think about making struct alloc size without fn pointer and in that foo realloc if
+// then you could include some other useful foo's without growing vec struct size when unneeded
+int Vec_set_after_rm_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
+	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	vec->after_rm= fn;
+	return CCOLL_SUCCESS;
 }

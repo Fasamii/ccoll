@@ -28,8 +28,9 @@ int Vec_alloc(Vec *vec, size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 
-	void *tmp_data = (void *
-	)realloc(vec->data, (vec->capacity + idxs) * vec->element_size);
+	void *tmp_data = (void *)realloc(
+	    vec->data, (vec->capacity + idxs) * vec->element_size
+	);
 	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
 
 	vec->data = tmp_data;
@@ -69,7 +70,7 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 
 	size_t errors = 0;
 	if (vec->after_rm) {
-		for (size_t i = to_idx; i >= from_idx; i--) {
+		for (size_t i = from_idx; i < to_idx; i++) {
 			if (vec->after_rm(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
@@ -82,8 +83,19 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	    vec->data + (to_idx * vec->element_size),
 	    (vec->size - to_idx) * vec->element_size
 	);
-
 	vec->size -= (to_idx - from_idx);
+
+	void *tmp_data = realloc(
+	    vec->data, (vec->capacity - (to_idx - from_idx)) * vec->element_size
+	);
+	// TODO:FIX: think how to handle error here, and after_rm fn call's (they
+	// shouldn't happen if operation failed) but you can't do them after
+	// realloc() cause that data doesn't exist anymore and tmp copying that is
+	// to expensive
+	// TODO: make new error (something like mem free failed but rest of the code worked correctly)
+	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
+	vec->data = tmp_data;
+	vec->capacity -= (to_idx - from_idx);
 
 	if (errors) return CCOLL_PASSED_FOO_FAIL_CONTINUED;
 	return CCOLL_SUCCESS;
@@ -91,15 +103,17 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 
 // TODO:FIX: make that actually free the size of one element
 // TODO:TEST: Make test for that foo
-// TODO: make foo fail continued
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (idx >= vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (vec->after_rm) {
-		if (vec->after_rm(vec->data + (idx * vec->element_size), vec->element_size))
-			return CCOLL_PASSED_FOO_FAIL;
+		size_t errors = 0;
+		if (vec->after_rm(
+			  vec->data + (idx * vec->element_size), vec->element_size
+		    ))
+			errors++;
 	}
 
 	memmove(

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define section(name) fprintf(stdout, "\n%s\n", name);
 
@@ -55,6 +56,7 @@ char random_alphanumeric() {
 	}
 }
 void generate_random_string(char *str, size_t length) {
+	srandom(time(NULL));
 	for (size_t i = 0; i < length; i++) {
 		str[i] = random_alphanumeric();
 	}

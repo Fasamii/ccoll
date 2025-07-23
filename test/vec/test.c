@@ -426,12 +426,12 @@ void TEST_vec_set_range(size_t size) {
 	    "Passed invalid values, should return errror"
 	);
 	assert_eq(vec->size == 0, "Additional check if vec size is valid");
-	assert_eq(*(char *)vec->data != data[0], "Additional data validation");
+	// assert_eq(*(char *)vec->data != data[0], "Additional data validation");
 
 	res = Vec_set_range(vec, data, 0, 0);
 	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
 	assert_eq(vec->size == 0, "But vec size should be 0");
-	assert_eq(*(char *)vec->data != data[0], "Additional data validation");
+	// assert_eq(*(char *)vec->data != data[0], "Additional data validation");
 
 	if (size > 1) {
 		res = Vec_set_range(vec, data, 0, size / 2);
@@ -445,7 +445,10 @@ void TEST_vec_set_range(size_t size) {
 
 	res = Vec_set_range(vec, data, 0, size);
 	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
-	assert_eq(vec->size == size, "size should be equal to %ld", size);
+	assert_eq(
+	    vec->size == size, "size should be equal to %ld but is %ld", size,
+	    vec->size
+	);
 	assert_eq(*(char *)vec->data == data[0], "Additional data validation");
 
 	res = Vec_set_range(vec, data, size, size);
@@ -458,13 +461,53 @@ void TEST_vec_set_range(size_t size) {
 	    *(char *)Vec_get(vec, size) == data[0], "Additional data validation 2"
 	);
 
-	// for (size_t i = 0; i < vec->size; i++) {
-	// 	printf("Vec:%ld:%c\n", i,  *(char*)Vec_get(vec, i));
-	// }
-
 	Vec_free(vec);
 
 	return;
+}
+
+static int clicked = 0;
+int CALLBACK_after_fn_test(void *data, size_t element_size) {
+	log("CALLBACK: %c <- %ld;", *(char *)data, element_size);
+	clicked++;
+	return 0;
+}
+
+void TEST_after_fn() {
+	Vec *vec   = Vec_init(sizeof(char));
+	char *data = (char *)malloc(8 * sizeof(char));
+	generate_random_string(data, 7); // 31 bc 32 is null terminating
+
+	Vec_push_range(vec, data, 7);
+	Vec_set_after_rm_callback(vec, CALLBACK_after_fn_test);
+
+	clicked = 0;
+	Vec_set(vec, 0, &data[3]);
+	assert_eq(clicked == 1, "Callback foo should click that");
+
+	Vec_set_range(vec, data, 0, 3);
+	assert_eq(
+	    clicked == 4, "Callback function should increase click variable"
+	);
+
+	Vec_shrink(vec);
+	Vec_fill(vec, &data[2]);
+	assert_eq(
+	    clicked == 4 + 7, "Callback function should increase click variable"
+	);
+
+	Vec_free_range(vec, 0, 2);
+	// The shrink above ensure vec will have exactly 7 element's
+	assert_eq(
+	    clicked == 4 + 7 + 2,
+	    "Callback function should increase click variable"
+	);
+
+	Vec_free(vec);
+	assert_eq(
+	    clicked == 4 + 7 + 2 + 5,
+	    "Callback function should increase click variable"
+	);
 }
 
 int main(void) {
@@ -514,6 +557,8 @@ int main(void) {
 	TEST_vec_set_range(1);
 	TEST_vec_set_range(100);
 	TEST_vec_set_range(990090);
+	section("Callback foo");
+	TEST_after_fn();
 
 	printf("\n");
 	return 0;

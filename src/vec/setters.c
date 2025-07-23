@@ -1,14 +1,9 @@
 #include "../../ccoll_errors.h"
 #include "../../colors.h"
 #include "../../include/vec.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-int Vec_set_after_rm_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	vec->after_rm= fn;
-	return CCOLL_SUCCESS;
-}
 
 int Vec_set(Vec *vec, const size_t idx, const void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
@@ -23,6 +18,13 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 		);
 		vec->size++;
 		return CCOLL_SUCCESS;
+	} else {
+		// TODO: make return code check
+		if (vec->after_rm) {
+			vec->after_rm(
+			    vec->data + (idx * vec->element_size), vec->element_size
+			);
+		}
 	};
 
 	memcpy(vec->data + (idx * vec->element_size), data, vec->element_size);
@@ -127,9 +129,9 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	);
 
 	if (vec1->after_rm)
-		vec->after_rm= vec1->after_rm;
+		vec->after_rm = vec1->after_rm;
 	else if (vec2->after_rm)
-		vec->after_rm= vec2->after_rm;
+		vec->after_rm = vec2->after_rm;
 
 	vec->size = vec1->size + vec2->size;
 
@@ -143,28 +145,48 @@ int Vec_set_range(
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
 	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
+	// TODO: make overflow checks for other foo's
+	if (quantity > SIZE_MAX - start_idx) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
-	size_t data_replaced = vec->size - start_idx;
+	size_t end_idx = start_idx + quantity;
 
-	if (start_idx + quantity > vec->capacity) {
-		if (Vec_reserve(vec, quantity - data_replaced))
+	if (end_idx > vec->capacity) {
+		if (Vec_reserve(vec, end_idx - vec->size))
 			return CCOLL_OUT_OF_MEMORY;
 	}
 
+	if (vec->after_rm) {
+		size_t errors	   = 0;
+		size_t last_replaced = (end_idx > vec->size) ? vec->size : end_idx;
+		for (size_t i = start_idx; i < last_replaced; i++) {
+			if (vec->after_rm(
+				  vec->data + (i * vec->element_size), vec->element_size
+			    ))
+				errors++;
+		}
+	}
+
+	// TODO: read other foo's and change memmove into memcpy where it will be
+	// beneficial, also consider making some check if the data don't overlap
+	// if e.g.: someone sets data using existing data from the same vec
 	memmove(
 	    vec->data + (start_idx * vec->element_size), data,
 	    quantity * vec->element_size
 	);
 
-	vec->size += quantity - data_replaced;
+	if (end_idx > vec->size) {
+		vec->size = end_idx;
+	}
 
 	return CCOLL_SUCCESS;
 }
 
 // TODO:TEST: Make test for that foo
-int Vec_insert_range(Vec *vec, const void *data, const size_t start_idx, const size_t quantity) {
+int Vec_insert_range(
+    Vec *vec, const void *data, const size_t start_idx, const size_t quantity
+) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
@@ -241,8 +263,18 @@ int Vec_fill(Vec *vec, void *data) {
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
 
+	if (vec->after_rm) {
+		int errors = 0;
+		for (size_t i = 0; i < vec->size; i++) {
+			if (vec->after_rm(
+				  vec->data + (i * vec->element_size), vec->element_size
+			    ))
+				errors++;
+		}
+	}
+
 	for (size_t i = 0; i < vec->capacity; i++) {
-		memmove(
+		memcpy(
 		    vec->data + (i * vec->element_size), data, vec->element_size
 		);
 	}

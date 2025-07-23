@@ -85,8 +85,11 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // MEMORY //
 ////////////
 
-// Sets the foo that will be called on free for each element,
-// not that is not destructor just a callback
+// TODO: define caller error codes e.g.: 0 for ok 1 for error but ignore and 2
+// for terminate operation
+//
+// Sets the foo that will be called on free for each element, not that is not
+// destructor just a callback
 //
 // Can return:
 // - CCOLL_SUCCESS
@@ -178,7 +181,7 @@ int Vec_set_range(
 void *Vec_get(const Vec *vec, const size_t idx);
 
 // TODO: implement that foo
-void **Vec_get_range(const Vec *vec, const size_t from_idx, size_t to_idx);
+void *Vec_get_range(const Vec *vec, const size_t from_idx, size_t to_idx);
 
 // TODO: read all Returns: and fix mistakes like not existing anymore errors
 // etc...
@@ -238,9 +241,9 @@ void *Vec_pop(Vec *vec);
 void *Vec_pop_front(Vec *vec);
 
 // TODO: implement that foo
-void **Vec_pop_range(Vec *vec, size_t quantity);
+void *Vec_pop_range(Vec *vec, size_t quantity);
 // TODO: implement that foo
-void **Vec_pop_front_range(Vec *vec, size_t quantity);
+void *Vec_pop_front_range(Vec *vec, size_t quantity);
 
 ////////////////
 // VEC-SHI-IO //
@@ -272,16 +275,16 @@ int Vec_insert_range(
 // - CCOLL_EMPTY
 int Vec_remove(Vec *vec, size_t idx);
 
-// TODO: implement that foo
+// TODO: write doc for that foo
 int Vec_remove_range(Vec *vec, size_t from_idx, size_t to_idx);
 
-/////////////
-// VEC-VEC //
-/////////////
+////////////////
+// VEC-TO-VEC //
+////////////////
 
 // Appends Vec with another Vec
 //
-// Returns: 
+// Returns:
 // - CCOLL_SUCCESS
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
@@ -289,23 +292,22 @@ int Vec_append(Vec *base, const Vec *vec);
 
 // Creates new Vec from two provided Vec's
 //
-// Returns: 
-// - Pointer to cloned appended vector 
+// Returns:
+// - Pointer to cloned appended vector
 // - NULL on failure
 Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 
-// TODO: think about how to initialize new_vec variable (inside or outside of the foo)
-// Splits Vec into two separate Vec's at idx 
-// Returns: 
+// TODO: think about how to initialize new_vec variable (inside or outside of
+// the foo) Splits Vec into two separate Vec's at idx Returns:
 // - CCOLL_SUCCESS,
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
 int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 
-// TODO: think about how to initialize new_vec variable (inside or outside of the foo)
-// Clones Vec and splits that clone  into two separate Vec's at idx 
+// TODO: think about how to initialize new_vec variable (inside or outside of
+// the foo) Clones Vec and splits that clone  into two separate Vec's at idx
 //
-// Returns: 
+// Returns:
 // - CCOLL_SUCCESS
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
@@ -313,7 +315,7 @@ int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx);
 
 // Creates slice from provide Vec. Accepts negative indexes (Python style)
 //
-// Returns: 
+// Returns:
 // - Pointer to slice of Vec
 // - NULL on failure
 Vec *Vec_slice(Vec *vec, size_t from_idx, size_t to_idx);
@@ -329,11 +331,9 @@ Vec *Vec_slice(Vec *vec, size_t from_idx, size_t to_idx);
 // - CCOLL_INVALID_ARGUMENT
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 
-
-
 // Fills Vec capacity with provided value
 //
-// Returns: 
+// Returns:
 // - CCOLL_SUCCESS
 // - CCOLL_INVALID_ARGUMENT
 int Vec_fill(Vec *vec, void *data);
