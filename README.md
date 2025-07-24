@@ -33,6 +33,7 @@ make all # build's all .a files
 - [ ] fix on_remove foo functionality and make vec call it on every element removal
 - [ ] remove unnecessary checks on the top of each foo
 - [ ] consider making every foo that return's pointer return result code and take ** parameter
+- [ ] consider making some sort of macro for checks on the beginning of each foo
 > [!INFO] memmove probably uses below optimizations by default so check if you even need to think
 > about that 
 - [ ] think about using 128‑bit SIMD intrinsics and AVX2 intrinsics for maximum performance

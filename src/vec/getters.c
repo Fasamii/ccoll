@@ -52,7 +52,7 @@ void *Vec_pop_front(Vec *vec) {
 int Vec_remove(Vec *vec, const size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (vec->size < 1) return CCOLL_EMPTY;
+	if (vec->size == 0) return CCOLL_EMPTY;
 	if (idx >= vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (vec->on_remove) {
@@ -80,11 +80,12 @@ int Vec_remove(Vec *vec, const size_t idx) {
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (vec->size == 0) return CCOLL_EMPTY;
 	if (to_idx >= from_idx) return CCOLL_INVALID_ARGUMENT;
 	// TODO: consider adding below check to other foo's
 	// TODO: consider making some macro or check foo instead of writing the
 	// same code in every foo
-	if ((to_idx - from_idx) > vec->size) return CCOLL_INVALID_ARGUMENT;
+	if (to_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (vec->on_remove) {
 		// TODO: make that error handling that you described in

@@ -275,7 +275,11 @@ int Vec_insert_range(
 // - CCOLL_EMPTY
 int Vec_remove(Vec *vec, const size_t idx);
 
-// TODO: write doc for that foo
+// Removes data from specified range of indexes
+//
+// Returns:
+// - CCOLL_SUCCESS
+// - CCOLL_INVALID_ARGUMENT
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
 ////////////////
