@@ -17,4 +17,6 @@
 
 #define CCOLL_OVERFLOW -8
 
+#define CCOLL_DESTROYED 8
+
 #endif

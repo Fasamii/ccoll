@@ -297,15 +297,13 @@ int Vec_append(Vec *base, const Vec *vec);
 // - NULL on failure
 Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 
-// TODO: think about how to initialize new_vec variable (inside or outside of
-// the foo) Splits Vec into two separate Vec's at idx Returns:
+// Splits Vec into two separate Vec's at idx Returns:
 // - CCOLL_SUCCESS,
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx);
 
-// TODO: think about how to initialize new_vec variable (inside or outside of
-// the foo) Clones Vec and splits that clone  into two separate Vec's at idx
+// Clones Vec and splits that clone  into two separate Vec's at idx
 //
 // Returns:
 // - CCOLL_SUCCESS

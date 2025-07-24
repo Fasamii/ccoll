@@ -11,15 +11,23 @@ int Vec_for_each(
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!fn) return CCOLL_INVALID_ARGUMENT;
 
-	size_t errors = 0;
+	// TODO:TEST: test that callback implementation
+	// TODO: make other foo's use similar system
 	for (size_t i = 0; i < vec->size; i++) {
-		// TODO: allow it for returning codes that can modify the vec e.g.:
-		// remove element, skip, skip multiple, and similar
-		if (fn(vec->data + (i * vec->element_size), i, vec->element_size))
-			errors++;
+		switch (
+		    fn(vec->data + (i * vec->element_size), i, vec->element_size)
+		) {
+		// TODO: document that return operation's
+		case 0: break;
+		case 1: Vec_remove(vec, i); break;
+		case 2: i++; break;
+		case 3:
+			Vec_free(vec);
+			return CCOLL_DESTROYED;
+			break;
+		}
 	}
 
-	if (errors) return CCOLL_PASSED_FOO_FAIL_CONTINUED;
 	return CCOLL_SUCCESS;
 }
 

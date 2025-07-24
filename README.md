@@ -32,6 +32,7 @@ make all # build's all .a files
 - [ ] make some error logging functionality that can be disabled in build time
 - [ ] fix after_rm foo functionality and make vec call it on every element removal
 - [ ] remove unnecessary checks on the top of each foo
+- [ ] consider making every foo that return's pointer return result code and take ** parameter
 > [!INFO] memmove probably uses below optimizations by default so check if you even need to think
 > about that 
 - [ ] think about using 128‑bit SIMD intrinsics and AVX2 intrinsics for maximum performance
