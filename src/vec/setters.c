@@ -19,11 +19,23 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 		vec->size++;
 		return CCOLL_SUCCESS;
 	} else {
-		// TODO: make return code check
 		if (vec->on_remove) {
-			vec->on_remove(
+			switch (vec->on_remove(
 			    vec->data + (idx * vec->element_size), vec->element_size
-			);
+			)) {
+			case 0: break;
+			// TODO: change that success into some half error codes like
+			// Canceled
+			case 1: return CCOLL_SUCCESS;
+			case 2: return CCOLL_SUCCESS;
+			case 3:
+				Vec_free(vec);
+				return CCOLL_DESTROYED;
+				break;
+			default: /* TODO: when you make logging put log here about not
+					handled code */
+				break;
+			};
 		}
 	};
 
