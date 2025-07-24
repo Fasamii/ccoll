@@ -150,6 +150,9 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	return vec;
 }
 
+// IMPORTANT:TEST: that foo, at this point I don't know if it's even valid (I am
+// to tired rn (literally hands are shaking lol)) i will probably check that
+// tomorrow
 int Vec_set_range(
     Vec *vec, const void *data, const size_t start_idx, const size_t quantity
 ) {
@@ -169,24 +172,34 @@ int Vec_set_range(
 			return CCOLL_OUT_OF_MEMORY;
 	}
 
-	if (vec->on_remove) {
-		size_t errors	   = 0;
-		size_t last_replaced = (end_idx > vec->size) ? vec->size : end_idx;
-		for (size_t i = start_idx; i < last_replaced; i++) {
-			if (vec->on_remove(
-				  vec->data + (i * vec->element_size), vec->element_size
-			    ))
-				errors++;
+	if (vec->on_remove && start_idx < vec->size) {
+		size_t omitted = 0;
+		for (size_t i = 0; i < quantity; i++) {
+			switch (vec->on_remove(
+			    vec->data + ((i + quantity) * vec->element_size),
+			    vec->element_size
+			)) {
+			case 0:
+				memcpy(
+				    vec->data + ((i + start_idx) * vec->element_size),
+				    data + ((i)*vec->element_size), vec->element_size
+				);
+				break;
+			case 1: omitted++; continue;
+			case 2: Vec_free(vec); return CCOLL_DESTROYED;
+			}
 		}
-	}
-
-	memcpy(
-	    vec->data + (start_idx * vec->element_size), data,
-	    quantity * vec->element_size
-	);
-
-	if (end_idx > vec->size) {
-		vec->size = end_idx;
+		if (end_idx > vec->size) {
+			vec->size = end_idx - omitted;
+		}
+	} else {
+		memcpy(
+		    vec->data + (start_idx * vec->element_size), data,
+		    quantity * vec->element_size
+		);
+		if (end_idx > vec->size) {
+			vec->size = end_idx;
+		}
 	}
 
 	return CCOLL_SUCCESS;

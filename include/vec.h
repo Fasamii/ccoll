@@ -90,8 +90,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // codes:
 // 0 - nothing
 // 1 - cancel element operation
-// 2 - cancel entire operation
-// 3 - destroy entire vec
+// 2 - destroy entire vec
 // IMPORTANT:TEST: make test's for on_remove error codes
 //
 // Sets the foo that will be called on free for each element, not that is not

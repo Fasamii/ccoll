@@ -3,9 +3,11 @@
 // You need to make error codes for:
 // - Success -> When everything was ok
 // - Out of memory -> on malloc or realloc fail's
-// - Canceled -> Canceled by on_remove fn return code
 // - Destroyed -> If foo is successful but data structure was destroyed (freed) 
 // - CCOLL Overflow -> self explanatory
+// +> callback behaviours
+//	- Success but omitted one element
+//	- Canceled -> Canceled by on_remove fn return code
 // +> For invalid input data:
 //	 - ccoll is NULL -> when reference to data structure is NULL 
 //	 - not enough memory requested
