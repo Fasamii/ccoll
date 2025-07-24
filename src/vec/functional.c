@@ -12,12 +12,10 @@ int Vec_for_each(
 	if (!fn) return CCOLL_INVALID_ARGUMENT;
 
 	// TODO:TEST: test that callback implementation
-	// TODO: make other foo's use similar system
 	for (size_t i = 0; i < vec->size; i++) {
 		switch (
 		    fn(vec->data + (i * vec->element_size), i, vec->element_size)
 		) {
-		// TODO: document that return operation's
 		case 0: break;
 		case 1: Vec_remove(vec, i); break;
 		case 2: i++; break;

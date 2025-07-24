@@ -343,6 +343,12 @@ int Vec_fill(Vec *vec, const void *data);
 // Functional fashion foo that takes foo which will be called against all
 // elements of Vec
 //
+// Passed *fn have special functionality based on return value:
+//	0 - do nothing
+//	1 - remove that element from vec
+//	2 - skip next element
+//	3 - destroy entire vec
+//
 // Returns: CCOLL_PASSED_FOO_FAIL_CONTINUED, CCOLL_INVALID_ARGUMENT,
 // CCOLL_SUCCESS
 int Vec_for_each(
