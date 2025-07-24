@@ -46,49 +46,22 @@ typedef struct Lli {
 // TODO: put here created foo's
 // TODO: document these foo's
 
-// Initializes Lli collection
-//
-// Returns: Pointer to Lli, NULL on failure
 Lli *Lli_init(size_t sizeof_data);
 
-//
-//
-//
 Lli_node *Lli_create_node(void *data, size_t element_size);
 
-//
-//
-//
 int Lli_set(Lli *lli, size_t idx, void *data);
 
-//
-//
-//
 void *Lli_get_owned(Lli *lli, size_t idx);
 
-//
-//
-//
 int Lli_insert(Lli *lli, size_t idx, void *data);
 
-//
-//
-//
 int Lli_push(Lli *lli, void *data);
 
-//
-//
-//
 void *Lli_pop(Lli *lli);
 
-//
-//
-//
 int Lli_push_front(Lli *lli, void *data);
 
-//
-//
-//
 void *Lli_pop_front(Lli *lli);
 
 #endif

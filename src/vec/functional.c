@@ -41,7 +41,7 @@ Vec *Vec_filter(
 	    vec->element_size, vec->size > 16 ? vec->size / 2 : vec->size
 	);
 	if (!new) return NULL;
-	if (vec->after_rm) new->after_rm = vec->after_rm;
+	if (vec->on_remove) new->on_remove= vec->on_remove;
 
 	for (size_t i = 0; i < vec->size; i++) {
 		if (fn(vec->data + (i * vec->element_size), i, vec->element_size)) {

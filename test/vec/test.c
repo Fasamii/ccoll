@@ -222,7 +222,7 @@ int CALLBACK_after_element(void *element, size_t element_size) {
 void TEST_after_element(size_t size, int (*fn)(void *, size_t element_size)) {
 	Vec *vec = Vec_init_with((size + 1) * sizeof(char), size);
 	if (vec == NULL) return;
-	Vec_set_after_rm_callback(vec, fn);
+	Vec_set_on_remove_callback(vec, fn);
 
 	char *str = (char *)malloc((size + 1) * sizeof(char));
 	generate_random_string(str, size);
@@ -325,7 +325,7 @@ void TEST_vec_insert() {
 	assert_eq(*(long *)Vec_get(vec, 1) == data3, "Data integrity check");
 	assert_eq(*(long *)Vec_get(vec, 2) == data1, "Data integrity check");
 
-	Vec_set_after_rm_callback(vec, CALLBACK_vec_insert);
+	Vec_set_on_remove_callback(vec, CALLBACK_vec_insert);
 	Vec_free(vec);
 }
 
@@ -479,7 +479,7 @@ void TEST_after_fn() {
 	generate_random_string(data, 7); // 31 bc 32 is null terminating
 
 	Vec_push_range(vec, data, 7);
-	Vec_set_after_rm_callback(vec, CALLBACK_after_fn_test);
+	Vec_set_on_remove_callback(vec, CALLBACK_after_fn_test);
 
 	clicked = 0;
 	Vec_set(vec, 0, &data[3]);

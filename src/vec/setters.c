@@ -20,8 +20,8 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 		return CCOLL_SUCCESS;
 	} else {
 		// TODO: make return code check
-		if (vec->after_rm) {
-			vec->after_rm(
+		if (vec->on_remove) {
+			vec->on_remove(
 			    vec->data + (idx * vec->element_size), vec->element_size
 			);
 		}
@@ -128,10 +128,10 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	    vec2->size * vec2->element_size
 	);
 
-	if (vec1->after_rm)
-		vec->after_rm = vec1->after_rm;
-	else if (vec2->after_rm)
-		vec->after_rm = vec2->after_rm;
+	if (vec1->on_remove)
+		vec->on_remove= vec1->on_remove;
+	else if (vec2->on_remove)
+		vec->on_remove= vec2->on_remove;
 
 	vec->size = vec1->size + vec2->size;
 
@@ -157,11 +157,11 @@ int Vec_set_range(
 			return CCOLL_OUT_OF_MEMORY;
 	}
 
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		size_t errors	   = 0;
 		size_t last_replaced = (end_idx > vec->size) ? vec->size : end_idx;
 		for (size_t i = start_idx; i < last_replaced; i++) {
-			if (vec->after_rm(
+			if (vec->on_remove(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;
@@ -263,10 +263,10 @@ int Vec_fill(Vec *vec, const void *data) {
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;
 
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		int errors = 0;
 		for (size_t i = 0; i < vec->size; i++) {
-			if (vec->after_rm(
+			if (vec->on_remove(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;

@@ -40,15 +40,15 @@ int Vec_alloc(Vec *vec, const size_t idxs) {
 }
 
 // TODO:TEST: Make test for that foo
-// TODO: apply the idea for handling after_rm foo
+// TODO: apply the idea for handling on_remove foo
 int Vec_free(Vec *vec) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 
 	size_t errors = 0;
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		for (size_t i = 0; i < vec->size; i++) {
-			if (vec->after_rm(
+			if (vec->on_remove(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;
@@ -63,7 +63,7 @@ int Vec_free(Vec *vec) {
 }
 
 // TODO:TEST: Make test for that foo
-// TODO: apply the idea for handling after_rm foo
+// TODO: apply the idea for handling on_remove foo
 int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -71,9 +71,9 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (to_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	size_t errors = 0;
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		for (size_t i = from_idx; i < to_idx; i++) {
-			if (vec->after_rm(
+			if (vec->on_remove(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;
@@ -90,7 +90,7 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	void *tmp_data = realloc(
 	    vec->data, (vec->capacity - (to_idx - from_idx)) * vec->element_size
 	);
-	// TODO:FIX: think how to handle error here, and after_rm fn call's (they
+	// TODO:FIX: think how to handle error here, and on_remove fn call's (they
 	// shouldn't happen if operation failed) but you can't do them after
 	// realloc() cause that data doesn't exist anymore and tmp copying that is
 	// to expensive
@@ -106,15 +106,15 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 
 // TODO:FIX: make that actually free the size of one element
 // TODO:TEST: Make test for that foo
-// TODO: apply the idea for handling after_rm foo
+// TODO: apply the idea for handling on_remove foo
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (idx >= vec->size) return CCOLL_INVALID_ARGUMENT;
 
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		size_t errors = 0;
-		if (vec->after_rm(
+		if (vec->on_remove(
 			  vec->data + (idx * vec->element_size), vec->element_size
 		    ))
 			errors++;

@@ -55,11 +55,11 @@ int Vec_remove(Vec *vec, const size_t idx) {
 	if (vec->size < 1) return CCOLL_EMPTY;
 	if (idx >= vec->size) return CCOLL_INVALID_ARGUMENT;
 
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		// TODO: make that error handling that you described in
 		// include/vec.h file
 		size_t errors = 0;
-		if (vec->after_rm(
+		if (vec->on_remove(
 			  vec->data + (idx * vec->element_size), vec->element_size
 		    ))
 			errors++;
@@ -86,12 +86,12 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	// same code in every foo
 	if ((to_idx - from_idx) > vec->size) return CCOLL_INVALID_ARGUMENT;
 
-	if (vec->after_rm) {
+	if (vec->on_remove) {
 		// TODO: make that error handling that you described in
 		// include/vec.h file
 		size_t errors = 0;
 		for (size_t i = from_idx; i < to_idx; i++) {
-			if (vec->after_rm(
+			if (vec->on_remove(
 				  vec->data + (i * vec->element_size), vec->element_size
 			    ))
 				errors++;

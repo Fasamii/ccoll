@@ -5,7 +5,8 @@
 #include <string.h>
 
 // TODO:TEST: Make test for that foo
-// TODO: change docs for that foo to tell that vec should be uninitialized and NULL
+// TODO: change docs for that foo to tell that vec should be uninitialized and
+// NULL
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 	if (!base) return CCOLL_INVALID_ARGUMENT;
 	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
@@ -21,7 +22,7 @@ int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 	}
 
 	new->element_size = base->element_size;
-	if (base->after_rm) new->after_rm = base->after_rm;
+	if (base->on_remove) new->on_remove = base->on_remove;
 
 	memcpy(
 	    new->data, base->data + (idx * base->element_size),
@@ -35,7 +36,8 @@ int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 }
 
 // TODO:TEST: Make test for that foo
-// TODO: change docs for that foo to tell that vec should be uninitialized and NULL
+// TODO: change docs for that foo to tell that vec should be uninitialized and
+// NULL
 int Vec_split_clone(
     const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx
 ) {
@@ -64,9 +66,9 @@ int Vec_split_clone(
 
 	new1->element_size = base->element_size;
 	new2->element_size = base->element_size;
-	if (base->after_rm) {
-		new1->after_rm = base->after_rm;
-		new2->after_rm = base->after_rm;
+	if (base->on_remove) {
+		new1->on_remove = base->on_remove;
+		new2->on_remove = base->on_remove;
 	}
 
 	memcpy(new1->data, base->data, idx * base->element_size);
@@ -97,13 +99,13 @@ Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx) {
 	if (slice_size == 0) {
 		Vec *new = Vec_init(vec->element_size);
 		if (!new) return NULL;
-		if (vec->after_rm) new->after_rm = vec->after_rm;
+		if (vec->on_remove) new->on_remove = vec->on_remove;
 		return new;
 	}
 
 	Vec *new = Vec_init_with(vec->element_size, slice_size);
 	if (!new) return NULL;
-	if (vec->after_rm) new->after_rm = vec->after_rm;
+	if (vec->on_remove) new->on_remove = vec->on_remove;
 
 	memmove(
 	    new->data, vec->data + (from_idx * vec->element_size),

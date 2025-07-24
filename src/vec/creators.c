@@ -14,7 +14,7 @@ Vec *Vec_init(const size_t size_of_data) {
 	vec->size		= 0;
 	vec->element_size = size_of_data;
 	vec->capacity	= VEC_MIN_CAPACITY;
-	vec->after_rm	= NULL;
+	vec->on_remove	= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -35,7 +35,7 @@ Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 	vec->size		= 0;
 	vec->element_size = size_of_data;
 	vec->capacity	= min_capacity;
-	vec->after_rm	= NULL;
+	vec->on_remove	= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -49,10 +49,10 @@ Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 // TODO: think about making struct alloc size without fn pointer and in that foo
 // realloc if then you could include some other useful foo's without growing vec
 // struct size when unneeded
-int Vec_set_after_rm_callback(
+int Vec_set_on_remove_callback(
     Vec *vec, int (*fn)(void *, size_t element_size)
 ) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	vec->after_rm = fn;
+	vec->on_remove = fn;
 	return CCOLL_SUCCESS;
 }

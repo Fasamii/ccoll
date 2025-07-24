@@ -58,7 +58,7 @@ typedef struct Vec {
 	size_t size;
 	size_t capacity;
 	size_t element_size;
-	int (*after_rm)(void *data, size_t element_size);
+	int (*on_remove)(void *data, size_t element_size);
 	void *data;
 } Vec;
 
@@ -94,7 +94,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // Can return:
 // - CCOLL_SUCCESS
 // - CCOLL_INVALID_ARGUMENT
-int Vec_set_after_rm_callback(Vec *vec, int (*fn)(void *, size_t element_size));
+int Vec_set_on_remove_callback(Vec *vec, int (*fn)(void *, size_t element_size));
 
 // Allocates enough memory to store provided number of elements
 //

@@ -1,3 +1,5 @@
+// TODO: after making other ccoll's make sure that errors are consistent, and overall redo error codes and names
+
 #ifndef CCOLL_ERROR_CODES_H
 #define CCOLL_ERROR_CODES_H
 

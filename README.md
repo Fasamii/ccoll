@@ -30,7 +30,7 @@ make all # build's all .a files
 - [ ] make get foo's have variants like get last and first
 - [ ] rewrite the .h files to group similar foo's and make better explanations
 - [ ] make some error logging functionality that can be disabled in build time
-- [ ] fix after_rm foo functionality and make vec call it on every element removal
+- [ ] fix on_remove foo functionality and make vec call it on every element removal
 - [ ] remove unnecessary checks on the top of each foo
 - [ ] consider making every foo that return's pointer return result code and take ** parameter
 > [!INFO] memmove probably uses below optimizations by default so check if you even need to think
