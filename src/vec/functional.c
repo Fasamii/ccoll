@@ -13,7 +13,8 @@ int Vec_for_each(
 
 	size_t errors = 0;
 	for (size_t i = 0; i < vec->size; i++) {
-		// TODO: allow it for returning codes that can modify the vec e.g.: remove element, skip, skip multiple, and similar
+		// TODO: allow it for returning codes that can modify the vec e.g.:
+		// remove element, skip, skip multiple, and similar
 		if (fn(vec->data + (i * vec->element_size), i, vec->element_size))
 			errors++;
 	}

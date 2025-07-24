@@ -258,7 +258,7 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 	return CCOLL_SUCCESS;
 }
 
-int Vec_fill(Vec *vec, void *data) {
+int Vec_fill(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (!data) return CCOLL_INVALID_ARGUMENT;

@@ -102,7 +102,7 @@ int Vec_set_after_rm_callback(Vec *vec, int (*fn)(void *, size_t element_size));
 // - CCOLL_SUCCESS
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
-int Vec_reserve(Vec *vec, size_t idxs);
+int Vec_reserve(Vec *vec, const size_t idxs);
 
 // Allocates exact memory to store provided number of elements
 //
@@ -110,7 +110,7 @@ int Vec_reserve(Vec *vec, size_t idxs);
 // - CCOLL_SUCCESS
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
-int Vec_alloc(Vec *vec, size_t idxs);
+int Vec_alloc(Vec *vec, const size_t idxs);
 
 // Frees memory to fit Vec content
 //
@@ -127,7 +127,7 @@ int Vec_shrink(Vec *vec);
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_NOT_ENOUGH_MEMORY_REQUESTED
 // - CCOLL_INVALID_ARGUMENT
-int Vec_shrink_to(Vec *vec, size_t size);
+int Vec_shrink_to(Vec *vec, const size_t size);
 
 // Frees Entire Vec structure
 //
@@ -273,10 +273,10 @@ int Vec_insert_range(
 // - CCOLL_SUCCESS
 // - CCOLL_INVALID_ARGUMENT
 // - CCOLL_EMPTY
-int Vec_remove(Vec *vec, size_t idx);
+int Vec_remove(Vec *vec, const size_t idx);
 
 // TODO: write doc for that foo
-int Vec_remove_range(Vec *vec, size_t from_idx, size_t to_idx);
+int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
 ////////////////
 // VEC-TO-VEC //
@@ -302,7 +302,7 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 // - CCOLL_SUCCESS,
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
-int Vec_split(Vec *base, Vec *new_vec, size_t idx);
+int Vec_split(Vec *base, Vec **new_vec, const size_t idx);
 
 // TODO: think about how to initialize new_vec variable (inside or outside of
 // the foo) Clones Vec and splits that clone  into two separate Vec's at idx
@@ -311,14 +311,14 @@ int Vec_split(Vec *base, Vec *new_vec, size_t idx);
 // - CCOLL_SUCCESS
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
-int Vec_split_clone(Vec *base, Vec *new_vec1, Vec *new_vec2, size_t idx);
+int Vec_split_clone(const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx);
 
 // Creates slice from provide Vec. Accepts negative indexes (Python style)
 //
 // Returns:
 // - Pointer to slice of Vec
 // - NULL on failure
-Vec *Vec_slice(Vec *vec, size_t from_idx, size_t to_idx);
+Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx);
 
 //////////
 // UTIL //
@@ -336,7 +336,7 @@ int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 // Returns:
 // - CCOLL_SUCCESS
 // - CCOLL_INVALID_ARGUMENT
-int Vec_fill(Vec *vec, void *data);
+int Vec_fill(Vec *vec, const void *data);
 
 ////////////////
 // FUNCTIONAL //

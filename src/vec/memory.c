@@ -6,7 +6,7 @@
 #include <string.h>
 
 // TODO:TEST: Make test for that foo
-int Vec_reserve(Vec *vec, size_t idxs) {
+int Vec_reserve(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 
@@ -24,7 +24,7 @@ int Vec_reserve(Vec *vec, size_t idxs) {
 }
 
 // TODO:TEST: Make test for that foo
-int Vec_alloc(Vec *vec, size_t idxs) {
+int Vec_alloc(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 
@@ -40,6 +40,7 @@ int Vec_alloc(Vec *vec, size_t idxs) {
 }
 
 // TODO:TEST: Make test for that foo
+// TODO: apply the idea for handling after_rm foo
 int Vec_free(Vec *vec) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -62,6 +63,7 @@ int Vec_free(Vec *vec) {
 }
 
 // TODO:TEST: Make test for that foo
+// TODO: apply the idea for handling after_rm foo
 int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -92,7 +94,8 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	// shouldn't happen if operation failed) but you can't do them after
 	// realloc() cause that data doesn't exist anymore and tmp copying that is
 	// to expensive
-	// TODO: make new error (something like mem free failed but rest of the code worked correctly)
+	// TODO: make new error (something like mem free failed but rest of the
+	// code worked correctly)
 	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
 	vec->data = tmp_data;
 	vec->capacity -= (to_idx - from_idx);
@@ -103,6 +106,7 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 
 // TODO:FIX: make that actually free the size of one element
 // TODO:TEST: Make test for that foo
+// TODO: apply the idea for handling after_rm foo
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
@@ -140,7 +144,7 @@ int Vec_shrink(Vec *vec) {
 }
 
 // TODO:TEST: Make test for that foo
-int Vec_shrink_to(Vec *vec, size_t idxs) {
+int Vec_shrink_to(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (idxs < vec->size) return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;

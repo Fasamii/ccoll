@@ -1,11 +1,11 @@
+#include "../../ccoll_errors.h"
 #include "../../colors.h"
 #include "../../include/vec.h"
-#include "../../ccoll_errors.h"
 
 #include <stddef.h>
 #include <stdlib.h>
 
-Vec *Vec_init(size_t size_of_data) {
+Vec *Vec_init(const size_t size_of_data) {
 	if (size_of_data == 0) return NULL;
 
 	Vec *vec = (Vec *)malloc(sizeof(Vec));
@@ -25,7 +25,7 @@ Vec *Vec_init(size_t size_of_data) {
 	return vec;
 }
 
-Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
+Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 	if (size_of_data == 0) return NULL;
 	if (min_capacity == 0) return NULL;
 
@@ -46,10 +46,13 @@ Vec *Vec_init_with(size_t size_of_data, size_t min_capacity) {
 	return vec;
 }
 
-// TODO: think about making struct alloc size without fn pointer and in that foo realloc if
-// then you could include some other useful foo's without growing vec struct size when unneeded
-int Vec_set_after_rm_callback(Vec *vec, int (*fn)(void *, size_t element_size)) {
+// TODO: think about making struct alloc size without fn pointer and in that foo
+// realloc if then you could include some other useful foo's without growing vec
+// struct size when unneeded
+int Vec_set_after_rm_callback(
+    Vec *vec, int (*fn)(void *, size_t element_size)
+) {
 	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	vec->after_rm= fn;
+	vec->after_rm = fn;
 	return CCOLL_SUCCESS;
 }
