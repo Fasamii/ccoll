@@ -17,7 +17,7 @@ int Lli_set(Lli *lli, size_t idx, void *data) {
 		iterator = iterator->next;
 	}
 
-	memmove(iterator->data, data, lli->element_size);
+	memcpy(iterator->data, data, lli->element_size);
 	return CCOLL_SUCCESS;
 }
 

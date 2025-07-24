@@ -14,7 +14,7 @@ void *Lli_get_owned(Lli *lli, size_t idx) {
 	if (!data) return NULL;
 
 	if (idx == lli->size - 1 && lli->tail) {
-		memmove(data, lli->tail->data, lli->element_size);
+		memcpy(data, lli->tail->data, lli->element_size);
 		return data;
 	}
 
@@ -23,7 +23,7 @@ void *Lli_get_owned(Lli *lli, size_t idx) {
 		iterator = iterator->next;
 	}
 
-	memmove(data, iterator->data, lli->element_size);
+	memcpy(data, iterator->data, lli->element_size);
 
 	return data;
 }
@@ -57,7 +57,7 @@ void *Lli_pop(Lli *lli) {
 	if (!data) return NULL;
 
 	if (lli->size == 1) {
-		memmove(data, lli->tail->data, lli->element_size);
+		memcpy(data, lli->tail->data, lli->element_size);
 		free(lli->tail);
 		lli->tail = NULL;
 		lli->head = NULL;
@@ -69,7 +69,7 @@ void *Lli_pop(Lli *lli) {
 	while (iterator->next != lli->tail)
 		iterator = iterator->next;
 
-	memmove(data, lli->tail->data, lli->element_size);
+	memcpy(data, lli->tail->data, lli->element_size);
 	free(lli->tail);
 
 	iterator->next = NULL;
@@ -88,7 +88,7 @@ void *Lli_pop_front(Lli *lli) {
 	void *data = (void *)malloc(lli->element_size);
 	if (!data) return NULL;
 
-	memmove(data, lli->head->data, lli->element_size);
+	memcpy(data, lli->head->data, lli->element_size);
 
 	if (lli->size == 1) {
 		free(lli->head);

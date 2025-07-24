@@ -129,9 +129,9 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	);
 
 	if (vec1->on_remove)
-		vec->on_remove= vec1->on_remove;
+		vec->on_remove = vec1->on_remove;
 	else if (vec2->on_remove)
-		vec->on_remove= vec2->on_remove;
+		vec->on_remove = vec2->on_remove;
 
 	vec->size = vec1->size + vec2->size;
 
@@ -168,10 +168,7 @@ int Vec_set_range(
 		}
 	}
 
-	// TODO: read other foo's and change memmove into memcpy where it will be
-	// beneficial, also consider making some check if the data don't overlap
-	// if e.g.: someone sets data using existing data from the same vec
-	memmove(
+	memcpy(
 	    vec->data + (start_idx * vec->element_size), data,
 	    quantity * vec->element_size
 	);
@@ -204,7 +201,7 @@ int Vec_insert_range(
 	    (vec->size - start_idx) * vec->element_size
 	);
 
-	memmove(
+	memcpy(
 	    vec->data + (start_idx * vec->element_size), data,
 	    quantity * vec->element_size
 	);

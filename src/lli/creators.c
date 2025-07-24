@@ -19,6 +19,6 @@ Lli_node *Lli_create_node(void *data, size_t element_size) {
 	Lli_node *lli_node = (Lli_node*)malloc(sizeof(Lli_node) + element_size);
 	if (!lli_node) return NULL;
 	lli_node->next = NULL;
-	memmove(lli_node->data, data, element_size);
+	memcpy(lli_node->data, data, element_size);
 	return lli_node;
 }

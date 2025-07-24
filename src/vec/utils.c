@@ -107,7 +107,7 @@ Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!new) return NULL;
 	if (vec->on_remove) new->on_remove = vec->on_remove;
 
-	memmove(
+	memcpy(
 	    new->data, vec->data + (from_idx * vec->element_size),
 	    slice_size * vec->element_size
 	);

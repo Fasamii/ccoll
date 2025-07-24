@@ -82,9 +82,6 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
 	if (vec->size == 0) return CCOLL_EMPTY;
 	if (to_idx >= from_idx) return CCOLL_INVALID_ARGUMENT;
-	// TODO: consider adding below check to other foo's
-	// TODO: consider making some macro or check foo instead of writing the
-	// same code in every foo
 	if (to_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
 
 	if (vec->on_remove) {
