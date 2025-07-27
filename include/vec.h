@@ -1,3 +1,4 @@
+// TODO:IMPORTANT: make overflow checks for void *data in these foo's
 #ifndef CCOLL_VEC_H
 #define CCOLL_VEC_H
 
@@ -50,17 +51,39 @@
 // #endif
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <sys/types.h>
 
-#define VEC_MIN_CAPACITY 8
+#define CCOLL_VEC_MIN_CAPACITY 8
+
+typedef enum CCOLL_OPERATION {
+	CCOLL_OPERATION_CREATE,		   // creating new element
+	CCOLL_OPERATION_REPLEACE,	   // replacing element
+	CCOLL_OPERATION_REPLEACE_FORCED, // replacing (unstoppable)
+	CCOLL_OPERATION_REMOVE,		   // removing element
+	CCOLL_OPERATION_REMOVE_FORCED,   //  removing (unstoppable)
+} CCOLL_OPERATION;
 
 typedef struct Vec {
 	size_t size;
 	size_t capacity;
 	size_t element_size;
-	int (*on_remove)(void *data, size_t element_size);
+	int (*on_remove)(
+	    void *data, size_t idx, size_t element_size, CCOLL_OPERATION operation
+	);
 	void *data;
 } Vec;
+
+/////////////
+// HELPERS //
+/////////////
+
+// TODO: make docs
+#define Vec_idx_to_bytes(vec, idx) ((vec)->element_size * (idx))
+#define Vec_bytes_to_idx(vec, idx) ((idx) / (vec)->element_size)
+
+// TODO: make copy / pointer variants of foo's
+// TODO: make unchecked variant of foo's
 
 //////////
 // INIT //
@@ -92,14 +115,19 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // 1 - cancel element operation
 // 2 - destroy entire vec
 // IMPORTANT:TEST: make test's for on_remove error codes
-//
+// TODO: make better docs about operation
 // Sets the foo that will be called on free for each element, not that is not
 // destructor just a callback
 //
 // Can return:
 // - CCOLL_SUCCESS
 // - CCOLL_INVALID_ARGUMENT
-int Vec_set_on_remove_callback(Vec *vec, int (*fn)(void *, size_t element_size));
+int Vec_set_on_remove_callback(
+    Vec *vec,
+    int (*fn)(
+	  void *, size_t idx, size_t element_size, CCOLL_OPERATION operation
+    )
+);
 
 // Allocates enough memory to store provided number of elements
 //
@@ -175,7 +203,7 @@ int Vec_set(Vec *vec, const size_t idx, const void *data);
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
 int Vec_set_range(
-    Vec *vec, const void *data, size_t start_idx, size_t quantity
+    Vec *vec, const void *data, size_t start_idx, const size_t quantity
 );
 
 // Returns pointer to data at specified Vec index
@@ -183,7 +211,13 @@ int Vec_set_range(
 // Returns:
 // - pointer to data
 // - NULL on failure
-void *Vec_get(const Vec *vec, const size_t idx);
+static inline void *Vec_get(const Vec *vec, const size_t idx) {
+	if (!vec) return NULL;
+	if (!vec->data) return NULL;
+	if (idx >= vec->size) return NULL;
+
+	return (char *)vec->data + (idx * vec->element_size);
+}
 
 // TODO: implement that foo
 void *Vec_get_range(const Vec *vec, const size_t from_idx, size_t to_idx);
@@ -318,7 +352,9 @@ int Vec_split(Vec *base, Vec **new_vec, const size_t idx);
 // - CCOLL_SUCCESS
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
-int Vec_split_clone(const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx);
+int Vec_split_clone(
+    const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx
+);
 
 // Creates slice from provide Vec. Accepts negative indexes (Python style)
 //

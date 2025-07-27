@@ -6,35 +6,29 @@
 #include <string.h>
 
 int Vec_set(Vec *vec, const size_t idx, const void *data) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (idx > vec->size) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (idx > vec->size) return CCOLL_INVALID_ELEMENT;
+	if (idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (idx == vec->size) {
-		if (Vec_alloc(vec, 1) != CCOLL_SUCCESS) return CCOLL_OUT_OF_MEMORY;
-		memcpy(
-		    vec->data + (idx * vec->element_size), data, vec->element_size
-		);
+		if (Vec_alloc(vec, 1)) return CCOLL_OUT_OF_MEMORY;
+		memcpy(Vec_get(vec, idx), data, Vec_idx_to_bytes(vec, 1));
 		vec->size++;
 		return CCOLL_SUCCESS;
 	} else {
 		if (vec->on_remove) {
 			switch (vec->on_remove(
-			    vec->data + (idx * vec->element_size), vec->element_size
+			    Vec_get(vec, idx), idx, vec->element_size,
+			    CCOLL_OPERATION_REPLEACE
 			)) {
 			case 0: break;
-			// TODO: change that success into some half error codes like
-			// Canceled
-			case 1: return CCOLL_SUCCESS;
-			case 2: return CCOLL_SUCCESS;
-			case 3:
+			case 1: return CCOLL_CANCELED;
+			case 2:
 				Vec_free(vec);
 				return CCOLL_DESTROYED;
 				break;
-			default: /* TODO: when you make logging put log here about not
-					handled code */
-				break;
+			default: break;
 			};
 		}
 	};
@@ -45,13 +39,12 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 }
 
 int Vec_push(Vec *vec, const void *data) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (vec->size + 1 > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->capacity == vec->size) {
-		if (Vec_alloc(vec, vec->capacity) != CCOLL_SUCCESS)
-			return CCOLL_OUT_OF_MEMORY;
+		if (Vec_alloc(vec, vec->capacity)) return CCOLL_OUT_OF_MEMORY;
 	}
 
 	memcpy(
@@ -62,9 +55,9 @@ int Vec_push(Vec *vec, const void *data) {
 }
 
 int Vec_push_front(Vec *vec, const void *data) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (vec->size + 1 > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->capacity <= vec->size) {
 		if (Vec_alloc(vec, vec->capacity) != CCOLL_SUCCESS)
@@ -82,42 +75,40 @@ int Vec_push_front(Vec *vec, const void *data) {
 }
 
 int Vec_insert(Vec *vec, const size_t idx, const void *data) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (idx > vec->size) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (idx > vec->size) return CCOLL_INVALID_ELEMENT;
+	if (idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->size >= vec->capacity) {
-		if (Vec_alloc(vec, vec->capacity) != CCOLL_SUCCESS)
-			return CCOLL_OUT_OF_MEMORY;
+		if (Vec_alloc(vec, vec->capacity)) return CCOLL_OUT_OF_MEMORY;
 	}
 
 	memmove(
-	    vec->data + ((idx + 1) * vec->element_size),
-	    vec->data + ((idx)*vec->element_size),
-	    (vec->size - idx) * vec->element_size
+	    Vec_get(vec, idx + 1), Vec_get(vec, idx),
+	    Vec_idx_to_bytes(vec, vec->size - idx)
 	);
-	memcpy(vec->data + (idx * vec->element_size), data, vec->element_size);
+	memcpy(Vec_get(vec, idx), data, Vec_idx_to_bytes(vec, 1));
 	vec->size++;
 
 	return CCOLL_SUCCESS;
 }
 
 int Vec_append(Vec *base, const Vec *vec) {
-	if (!base || !vec) return CCOLL_INVALID_ARGUMENT;
-	if (!base->data || !vec->data) return CCOLL_INVALID_ARGUMENT;
+	if (!base || !vec) return CCOLL_NULL;
+	if (!base->data || !vec->data) return CCOLL_NULL_DATA;
+	if (base->size + vec->size > SIZE_MAX) return CCOLL_OVERFLOW;
 	if (base->element_size != vec->element_size)
-		return CCOLL_INVALID_ARGUMENT;
+		return CCOLL_ELEMENT_SIZE_MISMATCH;
 
 	if ((base->capacity - base->size) < vec->size) {
 		size_t toalloc = base->size + vec->size;
-		if (Vec_reserve(base, toalloc) != CCOLL_SUCCESS)
-			return CCOLL_OUT_OF_MEMORY;
+		if (Vec_reserve(base, toalloc)) return CCOLL_OUT_OF_MEMORY;
 	}
 
+	// TODO: check if that base operations and pointer calculations are safe
 	memcpy(
-	    base->data + (base->size * base->element_size), vec->data,
-	    vec->size * base->element_size
+	    base->data + (base->size * base->element_size), vec->data, Vec_idx_to_bytes(vec, vec->size)
 	);
 
 	base->size += vec->size;
@@ -129,6 +120,7 @@ int Vec_append(Vec *base, const Vec *vec) {
 Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	if (!vec1 || !vec2) return NULL;
 	if (!vec1->data || !vec2->data) return NULL;
+	if (vec1->size + vec2->size > SIZE_MAX) return NULL;
 	if (vec1->element_size != vec2->element_size) return NULL;
 
 	Vec *vec = Vec_init_with(vec1->element_size, vec1->size + vec2->size);
@@ -150,18 +142,17 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	return vec;
 }
 
-// IMPORTANT:TEST: that foo, at this point I don't know if it's even valid (I am
-// to tired rn (literally hands are shaking lol)) i will probably check that
-// tomorrow
+// IMPORTANT: completely refactor that foo it works but it is so messy
+// I don't even want to look at it
+// IMPORTANT:TEST: that foo (better)
 int Vec_set_range(
-    Vec *vec, const void *data, const size_t start_idx, const size_t quantity
+    Vec *vec, const void *data, size_t start_idx, const size_t quantity
 ) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
-	// TODO: make overflow checks for other foo's
-	if (quantity > SIZE_MAX - start_idx) return CCOLL_OVERFLOW;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
+	// TODO:TEST: check if that is correct
+	if (vec->size + quantity - start_idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -172,21 +163,25 @@ int Vec_set_range(
 			return CCOLL_OUT_OF_MEMORY;
 	}
 
-	if (vec->on_remove && start_idx < vec->size) {
-		size_t omitted = 0;
-		for (size_t i = 0; i < quantity; i++) {
+	size_t omitted = 0;
+	if (vec->on_remove) {
+		for (size_t i = start_idx; i < start_idx + quantity; i++) {
 			switch (vec->on_remove(
-			    vec->data + ((i + quantity) * vec->element_size),
-			    vec->element_size
+			    Vec_get(vec, i), i, vec->element_size,
+			    CCOLL_OPERATION_REPLEACE
 			)) {
+			case 1:
+				if (i >= vec->size) omitted++;
+				start_idx--;
+				continue;
+			case 2: Vec_free(vec); return CCOLL_DESTROYED;
 			case 0:
 				memcpy(
-				    vec->data + ((i + start_idx) * vec->element_size),
-				    data + ((i)*vec->element_size), vec->element_size
+				    vec->data + (i * vec->element_size),
+				    data + ((i - start_idx) * vec->element_size),
+				    vec->element_size
 				);
 				break;
-			case 1: omitted++; continue;
-			case 2: Vec_free(vec); return CCOLL_DESTROYED;
 			}
 		}
 		if (end_idx > vec->size) {
@@ -198,7 +193,7 @@ int Vec_set_range(
 		    quantity * vec->element_size
 		);
 		if (end_idx > vec->size) {
-			vec->size = end_idx;
+			vec->size = end_idx - omitted;
 		}
 	}
 
@@ -206,13 +201,14 @@ int Vec_set_range(
 }
 
 // TODO:TEST: Make test for that foo
+// TODO: move that foo under insert foo
 int Vec_insert_range(
     Vec *vec, const void *data, const size_t start_idx, const size_t quantity
 ) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
-	if (start_idx > vec->size) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
+	if (vec->size + quantity - start_idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -238,9 +234,11 @@ int Vec_insert_range(
 
 // TODO: read implementation of that foo and apply to rest of range foo's
 int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	// TODO: check if you need both checks
+	if (quantity > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (vec->size + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -259,9 +257,11 @@ int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 }
 
 int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	// TODO: check if you need both checks
+	if (quantity > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (vec->size + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -281,24 +281,20 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 }
 
 int Vec_fill(Vec *vec, const void *data) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!data) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
 
 	if (vec->on_remove) {
-		int errors = 0;
 		for (size_t i = 0; i < vec->size; i++) {
-			if (vec->on_remove(
-				  vec->data + (i * vec->element_size), vec->element_size
-			    ))
-				errors++;
+			vec->on_remove(
+			    Vec_get(vec, i), i, vec->element_size,
+			    CCOLL_OPERATION_REPLEACE_FORCED
+			);
 		}
 	}
 
 	for (size_t i = 0; i < vec->capacity; i++) {
-		memcpy(
-		    vec->data + (i * vec->element_size), data, vec->element_size
-		);
+		memcpy(Vec_get(vec, i), data, Vec_idx_to_bytes(vec, 1));
 	}
 
 	vec->size = vec->capacity;

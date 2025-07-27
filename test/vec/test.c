@@ -4,6 +4,8 @@
 
 #include "../util.h"
 
+#include "free-range.c"
+
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -13,7 +15,7 @@ void TEST_inti_and_free(size_t sizeof_data) {
 	Vec *vec = Vec_init(sizeof_data);
 
 	assert_eq(
-	    vec != NULL && vec->size == 0 && vec->capacity == VEC_MIN_CAPACITY &&
+	    vec != NULL && vec->size == 0 && vec->capacity == CCOLL_VEC_MIN_CAPACITY &&
 		  vec->element_size == sizeof_data,
 	    "Vec_init()"
 	);

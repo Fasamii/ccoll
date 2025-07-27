@@ -13,7 +13,7 @@ Vec *Vec_init(const size_t size_of_data) {
 
 	vec->size		= 0;
 	vec->element_size = size_of_data;
-	vec->capacity	= VEC_MIN_CAPACITY;
+	vec->capacity	= CCOLL_VEC_MIN_CAPACITY;
 	vec->on_remove	= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
@@ -50,9 +50,13 @@ Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 // realloc if then you could include some other useful foo's without growing vec
 // struct size when unneeded
 int Vec_set_on_remove_callback(
-    Vec *vec, int (*fn)(void *, size_t element_size)
+    Vec *vec,
+    int (*fn)(
+	  void *, size_t idx, size_t element_size, CCOLL_OPERATION operation
+    )
 ) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!fn) return CCOLL_NULL_FN;
 	vec->on_remove = fn;
 	return CCOLL_SUCCESS;
 }

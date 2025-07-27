@@ -7,9 +7,9 @@
 int Vec_for_each(
     Vec *vec, int (*fn)(void *element, size_t idx, size_t element_size)
 ) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (!fn) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!fn) return CCOLL_NULL_FN;
 
 	// TODO:TEST: test that callback implementation
 	for (size_t i = 0; i < vec->size; i++) {
