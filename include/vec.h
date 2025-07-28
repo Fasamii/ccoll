@@ -1,6 +1,4 @@
 // TODO:IMPORTANT: make overflow checks for void *data in these foo's
-#ifndef CCOLL_VEC_H
-#define CCOLL_VEC_H
 
 /*
  * Vec (Vector)
@@ -33,9 +31,14 @@
  *	Vec_push(vec, t);
  */
 
+#ifndef CCOLL_VEC_H
+#define CCOLL_VEC_H
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/types.h>
+
+#include "../ccoll-codes.h"
 
 #define CCOLL_VEC_MIN_CAPACITY 8
 
@@ -83,16 +86,14 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // MEMORY //
 ////////////
 
-// TODO: define caller error codes e.g.: 0 for ok 1 for error but ignore and 2
-// for terminate operation
-// codes:
-// 0 - nothing
-// 1 - cancel element operation
-// 2 - destroy entire vec
 // IMPORTANT:TEST: make test's for on_remove error codes
-// TODO: make better docs about operation
-// Sets the foo that will be called on free for each element, not that is not
-// destructor just a callback
+
+// sets on_remove callback for the vec
+//
+// codes:
+// 1. CCOLL_CALLBACK_NOTHING - do nothing
+// 2. CCOLL_CALLBACK_CANCEL - cancel operation
+// 3. CCOLL_CALLBACK_DESTROY_VEC - destroy entire vec 
 //
 // Can return:
 // - CCOLL_SUCCESS

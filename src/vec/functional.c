@@ -16,10 +16,10 @@ int Vec_for_each(
 		switch (
 		    fn(vec->data + (i * vec->element_size), i, vec->element_size)
 		) {
-		case 0: break;
-		case 1: Vec_remove(vec, i); break;
-		case 2: i++; break;
-		case 3:
+		case CCOLL_CALLBACK_NOTHING: break;
+		case CCOLL_CALLBACK_REMOVE: Vec_remove(vec, i); break;
+		case CCOLL_CALLBACK_SKIP_NEXT: i++; break;
+		case CCOLL_CALLBACK_DESTROY_VEC:
 			Vec_free(vec);
 			return CCOLL_DESTROYED;
 			break;
@@ -41,7 +41,7 @@ Vec *Vec_filter(
 	    vec->element_size, vec->size > 16 ? vec->size / 2 : vec->size
 	);
 	if (!new) return NULL;
-	if (vec->on_remove) new->on_remove= vec->on_remove;
+	if (vec->on_remove) new->on_remove = vec->on_remove;
 
 	for (size_t i = 0; i < vec->size; i++) {
 		if (fn(vec->data + (i * vec->element_size), i, vec->element_size)) {

@@ -76,9 +76,11 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 			    Vec_get(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REMOVE
 			)) {
-			case 0: break;
-			case 1: Vec_push(omitted, &i); break;
-			case 2: Vec_free(vec); return CCOLL_DESTROYED;
+			case CCOLL_CALLBACK_NOTHING: break;
+			case CCOLL_CALLBACK_CANCEL: Vec_push(omitted, &i); break;
+			case CCOLL_CALLBACK_DESTROY_VEC:
+				Vec_free(vec);
+				return CCOLL_DESTROYED;
 			default: break;
 			}
 		}
@@ -135,9 +137,12 @@ int Vec_free_element(Vec *vec, size_t idx) {
 		    Vec_get(vec, idx), idx, vec->element_size,
 		    CCOLL_OPERATION_REMOVE
 		)) {
-		case 0: break;
-		case 1: return CCOLL_CANCELED;
-		case 3: Vec_free(vec); return CCOLL_DESTROYED;
+		case CCOLL_CALLBACK_NOTHING: break;
+		case CCOLL_CALLBACK_CANCEL: return CCOLL_CANCELED;
+		case CCOLL_CALLBACK_DESTROY_VEC:
+			Vec_free(vec);
+			return CCOLL_DESTROYED;
+		default: break;
 		}
 	}
 

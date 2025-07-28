@@ -22,9 +22,9 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 			    Vec_get(vec, idx), idx, vec->element_size,
 			    CCOLL_OPERATION_REPLEACE
 			)) {
-			case 0: break;
-			case 1: return CCOLL_CANCELED;
-			case 2:
+			case CCOLL_CALLBACK_NOTHING: break;
+			case CCOLL_CALLBACK_CANCEL: return CCOLL_CANCELED;
+			case CCOLL_CALLBACK_DESTROY_VEC:
 				Vec_free(vec);
 				return CCOLL_DESTROYED;
 				break;
@@ -170,12 +170,12 @@ int Vec_set_range(
 			    Vec_get(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REPLEACE
 			)) {
-			case 1:
+			case CCOLL_CALLBACK_CANCEL:
 				if (i >= vec->size) omitted++;
 				start_idx--;
 				continue;
-			case 2: Vec_free(vec); return CCOLL_DESTROYED;
-			case 0:
+			case CCOLL_CALLBACK_DESTROY_VEC: Vec_free(vec); return CCOLL_DESTROYED;
+			case CCOLL_CALLBACK_NOTHING:
 				memcpy(
 				    vec->data + (i * vec->element_size),
 				    data + ((i - start_idx) * vec->element_size),

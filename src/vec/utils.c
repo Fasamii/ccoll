@@ -8,10 +8,10 @@
 // TODO: change docs for that foo to tell that vec should be uninitialized and
 // NULL
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
-	if (!base) return CCOLL_INVALID_ARGUMENT;
-	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
-	if (!base->data) return CCOLL_INVALID_ARGUMENT;
-	if (!new_vec) return CCOLL_INVALID_ARGUMENT;
+	if (!base) return CCOLL_NULL;
+	if (!new_vec) return CCOLL_NULL;
+	if (!base->data) return CCOLL_NULL_DATA;
+	if (idx > base->size) return CCOLL_INVALID_ELEMENT;
 
 	Vec *new;
 	if (!*new_vec) {
@@ -41,11 +41,11 @@ int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 int Vec_split_clone(
     const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx
 ) {
-	if (!base) return CCOLL_INVALID_ARGUMENT;
-	if (!base->data) return CCOLL_INVALID_ARGUMENT;
-	if (idx > base->size) return CCOLL_INVALID_ARGUMENT;
-	if (!new_vec1) return CCOLL_INVALID_ARGUMENT;
-	if (!new_vec2) return CCOLL_INVALID_ARGUMENT;
+	if (!base) return CCOLL_NULL;
+	if (!new_vec1) return CCOLL_NULL;
+	if (!new_vec2) return CCOLL_NULL;
+	if (!base->data) return CCOLL_NULL_DATA;
+	if (idx > base->size) return CCOLL_INVALID_ELEMENT;
 
 	Vec *new1;
 	if (!*new_vec1) {
@@ -119,10 +119,10 @@ Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx) {
 
 // TODO:TEST: Make test for that foo
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2) {
-	if (!vec) return CCOLL_INVALID_ARGUMENT;
-	if (!vec->data) return CCOLL_INVALID_ARGUMENT;
-	if (idx1 >= vec->size) return CCOLL_INVALID_ARGUMENT;
-	if (idx2 >= vec->size) return CCOLL_INVALID_ARGUMENT;
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (idx1 >= vec->size) return CCOLL_INVALID_ELEMENT;
+	if (idx2 >= vec->size) return CCOLL_INVALID_ELEMENT;
 
 	if (idx1 == idx2) return CCOLL_SUCCESS;
 
