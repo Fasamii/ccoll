@@ -206,9 +206,6 @@ int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 );
 
-// TODO: replace Vec_get with Vec_get_unchecked in memmove and memcpy in
-// src code of vec & add where checks was breaking functionality
-//
 // Gets the element from specified index
 //
 // Returns:

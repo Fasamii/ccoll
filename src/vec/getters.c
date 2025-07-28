@@ -50,7 +50,7 @@ int Vec_remove(Vec *vec, const size_t idx) {
 
 	if (vec->on_remove) {
 		switch (vec->on_remove(
-		    Vec_get(vec, idx), idx, vec->element_size,
+		    Vec_get_unchecked(vec, idx), idx, vec->element_size,
 		    CCOLL_OPERATION_REMOVE
 		)) {
 		case CCOLL_CALLBACK_NOTHING: break;
@@ -86,7 +86,7 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		Vec *omitted  = Vec_init_with(sizeof(size_t), range);
 		for (size_t i = from_idx; i < to_idx; i++) {
 			switch (vec->on_remove(
-			    Vec_get(vec, i), i, vec->element_size,
+			    Vec_get_unchecked(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REMOVE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
@@ -106,7 +106,7 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		while (omitted->size > 0) {
 			size_t idx = *(size_t *)Vec_pop_front(omitted);
 			memmove(
-			    Vec_get(vec, idx), Vec_get(vec, idx + 1),
+			    Vec_get_unchecked(vec, idx), Vec_get_unchecked(vec, idx + 1),
 			    Vec_idx_to_bytes(vec, vec->size - idx)
 			);
 		}
@@ -128,7 +128,7 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		// TODO: consider better use of variables in memmove like range
 		// etc...
 		memmove(
-		    Vec_get(vec, from_idx), Vec_get(vec, to_idx),
+		    Vec_get_unchecked(vec, from_idx), Vec_get_unchecked(vec, to_idx),
 		    Vec_idx_to_bytes(vec, vec->size - to_idx)
 		);
 

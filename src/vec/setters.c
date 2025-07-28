@@ -21,7 +21,7 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 	} else {
 		if (vec->on_remove) {
 			switch (vec->on_remove(
-			    Vec_get(vec, idx), idx, vec->element_size,
+			    Vec_get_unchecked(vec, idx), idx, vec->element_size,
 			    CCOLL_OPERATION_REPLACE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
@@ -301,7 +301,7 @@ int Vec_fill(Vec *vec, const void *data) {
 	if (vec->on_remove) {
 		for (size_t i = 0; i < vec->size; i++) {
 			vec->on_remove(
-			    Vec_get(vec, i), i, vec->element_size,
+			    Vec_get_unchecked(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REPLACE_FORCED
 			);
 		}
