@@ -1,4 +1,5 @@
 // TODO:IMPORTANT: make overflow checks for void *data in these foo's
+// TODO:IMPORTANT: rename every repleace to replace
 
 /*
  * Vec (Vector)
@@ -93,7 +94,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // codes:
 // 1. CCOLL_CALLBACK_NOTHING - do nothing
 // 2. CCOLL_CALLBACK_CANCEL - cancel operation
-// 3. CCOLL_CALLBACK_DESTROY_VEC - destroy entire vec 
+// 3. CCOLL_CALLBACK_DESTROY_VEC - destroy entire vec
 //
 // Can return:
 // - CCOLL_SUCCESS
@@ -112,6 +113,9 @@ int Vec_set_on_remove_callback(
 // - CCOLL_OUT_OF_MEMORY
 // - CCOLL_INVALID_ARGUMENT
 int Vec_reserve(Vec *vec, const size_t idxs);
+
+// TODO: make doc
+int Vec_reserve_entire(Vec *vec, const size_t idxs);
 
 // Allocates exact memory to store provided number of elements
 //
@@ -182,6 +186,13 @@ int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 );
 
+// TODO: doc
+// TODO: replace Vec_get with Vec_get_unchecked in memmove and memcpy in src
+// code of vec & add where checks was breaking functionality
+static inline void *Vec_get_unchecked(const Vec *vec, const size_t idx) {
+	return (char *)vec->data + (idx * vec->element_size);
+}
+
 // Returns pointer to data at specified Vec index
 //
 // Returns:
@@ -192,7 +203,7 @@ static inline void *Vec_get(const Vec *vec, const size_t idx) {
 	if (!vec->data) return NULL;
 	if (idx >= vec->size) return NULL;
 
-	return (char *)vec->data + (idx * vec->element_size);
+	return Vec_get_unchecked(vec, idx);
 }
 
 // TODO: implement that foo

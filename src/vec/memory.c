@@ -22,6 +22,22 @@ int Vec_reserve(Vec *vec, const size_t idxs) {
 	return CCOLL_SUCCESS;
 }
 
+// IMPORTANT:TEST: that foo
+int Vec_reserve_entire(Vec *vec, const size_t idxs) {
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_DATA;
+	if (idxs < vec->size) return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
+
+	if (idxs <= vec->capacity) return CCOLL_SUCCESS;
+
+	void *tmp_data = realloc(vec->data, Vec_idx_to_bytes(vec, idxs));
+	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
+	vec->data	  = tmp_data;
+	vec->capacity = idxs;
+
+	return CCOLL_SUCCESS;
+}
+
 // TODO:TEST: Make test for that foo
 int Vec_alloc(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_NULL;
