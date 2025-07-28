@@ -89,8 +89,6 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // MEMORY //
 ////////////
 
-// IMPORTANT:TEST: make test's for on_remove error codes
-
 // sets on_remove callback for the vec
 //
 // codes:
@@ -100,7 +98,8 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 //
 // Can return:
 // - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_NULL
+// - CCOLL_NULL_FN
 int Vec_set_on_remove_callback(
     Vec *vec,
     int (*fn)(
@@ -108,63 +107,70 @@ int Vec_set_on_remove_callback(
     )
 );
 
+// Allocates enough memory to store provided additional number of elements
+//
+// Returns:
+// - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_OUT_OF_MEMORY
+int Vec_reserve(Vec *vec, const size_t idxs);
+
 // Allocates enough memory to store provided number of elements
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NOT_ENOUGH_MEMORY_REQUESTED
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
-int Vec_reserve(Vec *vec, const size_t idxs);
-
-// TODO: make doc
 int Vec_reserve_entire(Vec *vec, const size_t idxs);
 
-// Allocates exact memory to store provided number of elements
+// Allocates memory for exact amount of elements
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_alloc(Vec *vec, const size_t idxs);
 
-// Frees memory to fit Vec content
+// Frees memory to fit Vec contents
 //
-// Can return:
+// Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_shrink(Vec *vec);
 
 // Frees memory to fit provided size
 //
-// Can return:
+// Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_OUT_OF_MEMORY
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
 // - CCOLL_NOT_ENOUGH_MEMORY_REQUESTED
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_OUT_OF_MEMORY
 int Vec_shrink_to(Vec *vec, const size_t size);
 
-// Frees Entire Vec structure
+// Frees entire Vec structure
 //
 // Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
 int Vec_free(Vec *vec);
 
-// Removes element at specified index
+// Frees specified amount of idxs from Vec
 //
 // Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_PASSED_FOO_FAIL
-// - CCOLL_INVALID_ARGUMENT
-int Vec_free_element(Vec *vec, size_t idx);
-
-// Removes elements from specified range of the Vec
-//
-// Returns:
-// - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
-int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx);
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NOT_ENOUGH_MEMORY_REQUESTED
+// - CCOLL_OUT_OF_MEMORY
+int Vec_free_ammount(Vec *vec, size_t idxs);
 
 ////////////////
 // VEC-IDX-IO //
@@ -174,23 +180,40 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx);
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_INVALID_ELEMENT
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT,
+// - CCOLL_CANCELED
+// - CCOLL_DESTROYED
 int Vec_set(Vec *vec, const size_t idx, const void *data);
 
 // Set range of elements
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_INVALID_ELEMENT
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_SUCCESS_WITH_CANCELED
+// - CCOLL_DESTROYED
 int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 );
 
-// TODO: doc
-// TODO: replace Vec_get with Vec_get_unchecked in memmove and memcpy in src
-// code of vec & add where checks was breaking functionality
+// TODO: replace Vec_get with Vec_get_unchecked in memmove and memcpy in
+// src code of vec & add where checks was breaking functionality
+//
+// Gets the element from specified index
+//
+// Returns:
+// - pointer to data
+// - undefined behavior
 static inline void *Vec_get_unchecked(const Vec *vec, const size_t idx) {
 	return (char *)vec->data + (idx * vec->element_size);
 }
@@ -208,12 +231,6 @@ static inline void *Vec_get(const Vec *vec, const size_t idx) {
 	return Vec_get_unchecked(vec, idx);
 }
 
-// TODO: implement that foo
-void *Vec_get_range(const Vec *vec, const size_t from_idx, size_t to_idx);
-
-// TODO: read all Returns: and fix mistakes like not existing anymore errors
-// etc...
-
 ////////////////
 // VEC-POS-IO //
 ////////////////
@@ -222,32 +239,44 @@ void *Vec_get_range(const Vec *vec, const size_t from_idx, size_t to_idx);
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT,
 int Vec_push(Vec *vec, const void *data);
 
 // Push data to the front
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_push_front(Vec *vec, const void *data);
 
 // Appends specified number of elements to Vec's back
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_push_range(Vec *vec, const void *data, size_t quantity);
 
 // Appends specified number of elements to Vec's front
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_push_front_range(Vec *vec, const void *data, size_t quantity);
 
 // Pop's data from the end and returns pointer to it
@@ -255,8 +284,6 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity);
 // Returns:
 // - Pointer to data
 // - NULL on failure
-//
-// !! You should free returned by data yourself !!
 void *Vec_pop(Vec *vec);
 
 // Pop's data from the beginning and returns pointer to it
@@ -264,14 +291,7 @@ void *Vec_pop(Vec *vec);
 // Returns:
 // - Pointer to data
 // - NULL on failure
-//
-// !! You should free returned by data yourself !!
 void *Vec_pop_front(Vec *vec);
-
-// TODO: implement that foo
-void *Vec_pop_range(Vec *vec, size_t quantity);
-// TODO: implement that foo
-void *Vec_pop_front_range(Vec *vec, size_t quantity);
 
 ////////////////
 // VEC-SHI-IO //
@@ -281,16 +301,23 @@ void *Vec_pop_front_range(Vec *vec, size_t quantity);
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_INVALID_ELEMENT
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_insert(Vec *vec, const size_t idx, const void *data);
 
 // Inserts data from specified start_idx
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_INVALID_ELEMENT
+// - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_insert_range(
     Vec *vec, const void *data, const size_t start_idx, const size_t quantity
 );
@@ -299,17 +326,30 @@ int Vec_insert_range(
 //
 // Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
 // - CCOLL_EMPTY
+// - CCOLL_INVALID_ELEMENT
+// - CCOLL_CANCELED
+// - CCOLL_DESTROYED
 int Vec_remove(Vec *vec, const size_t idx);
 
 // Removes data from specified range of indexes
 //
 // Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
+// - CCOLL_INVALID_RANGE
+// - CCOLL_INVALID_ELEMENT
+// - CCOLL_SUCCESS_WITH_CANCELED
+// - CCOLL_SUCCESS_NO_REMOVED_MEMORY_WITH_CANCELED
+// - CCOLL_DESTROYED
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
+// TODO: implement on_remove for that
+//
 // Removes all elements from the vec
 //
 // Returns:
@@ -326,8 +366,11 @@ int Vec_remove_all(Vec *vec);
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_OVERFLOW
+// - CCOLL_ELEMENT_SIZE_MISMATCH
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_append(Vec *base, const Vec *vec);
 
 // Creates new Vec from two provided Vec's
@@ -337,23 +380,41 @@ int Vec_append(Vec *base, const Vec *vec);
 // - NULL on failure
 Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 
-// Splits Vec into two separate Vec's at idx Returns:
+// Splits Vec into two separate Vec's at idx. Foo automatically Initializes
+// new_vecs
+//
+// Returns:
 // - CCOLL_SUCCESS,
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_INVALID_ELEMENT
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx);
 
-// Clones Vec and splits that clone  into two separate Vec's at idx
+// Clones Vec and splits that clone  into two separate Vec's at idx. Foo
+// automatically Initializes new_vecs
 //
 // Returns:
 // - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_INVALID_ELEMENT
 // - CCOLL_OUT_OF_MEMORY
-// - CCOLL_INVALID_ARGUMENT
 int Vec_split_clone(
     const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx
 );
 
-// Creates slice from provide Vec. Accepts negative indexes (Python style)
+// Slices passed vec
+//
+// Returns:
+// - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_INVALID_RANGE
+// - CCOLL_INVALID_ELEMENT
+int Vec_slice(Vec *vec, size_t from_idx, size_t to_idx);
+
+// Creates slice from provided Vec
 //
 // Returns:
 // - Pointer to slice of Vec
@@ -368,14 +429,18 @@ Vec *Vec_slice_clone(const Vec *vec, size_t from_idx, size_t to_idx);
 //
 // Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_INVALID_ELEMENT
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 
 // Fills Vec capacity with provided value
 //
 // Returns:
 // - CCOLL_SUCCESS
-// - CCOLL_INVALID_ARGUMENT
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_DATA
 int Vec_fill(Vec *vec, const void *data);
 
 ////////////////
@@ -391,15 +456,21 @@ int Vec_fill(Vec *vec, const void *data);
 //	2 - skip next element
 //	3 - destroy entire vec
 //
-// Returns: CCOLL_PASSED_FOO_FAIL_CONTINUED, CCOLL_INVALID_ARGUMENT,
-// CCOLL_SUCCESS
+// Returns:
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+// - CCOLL_NULL_FN
+// - CCOLL_DESTROYED
 int Vec_for_each(
     Vec *vec, int (*fn)(void *element, size_t idx, size_t element_size)
 );
 
-// Functional fashion foo that filters out which elements to clone to new Vec
+// Functional fashion foo that filters out which elements to clone to new
+// Vec
 //
-// Returns: Vec that was created from filtered elements, NULL on failure
+// Returns: 
+// - Vec that was created from filtered elements
+// - NULL on failure
 Vec *Vec_filter(
     Vec *vec, bool (*fn)(void *element, size_t idx, size_t element_size)
 );

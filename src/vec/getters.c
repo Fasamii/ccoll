@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -75,20 +76,24 @@ int Vec_remove(Vec *vec, const size_t idx) {
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
-	if (to_idx >= from_idx) return CCOLL_INVALID_ELEMENT;
 	if (to_idx > vec->size) return CCOLL_INVALID_RANGE;
+	if (to_idx >= from_idx) return CCOLL_INVALID_ELEMENT;
 
 	size_t range = (to_idx - from_idx);
 
 	if (vec->on_remove) {
-		Vec *omitted = Vec_init_with(sizeof(size_t), range);
+		bool canceled = false;
+		Vec *omitted  = Vec_init_with(sizeof(size_t), range);
 		for (size_t i = from_idx; i < to_idx; i++) {
 			switch (vec->on_remove(
 			    Vec_get(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REMOVE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
-			case CCOLL_CALLBACK_CANCEL: Vec_push(omitted, &i); break;
+			case CCOLL_CALLBACK_CANCEL:
+				canceled = true;
+				Vec_push(omitted, &i);
+				break;
 			case CCOLL_CALLBACK_DESTROY_VEC:
 				Vec_free(vec);
 				return CCOLL_DESTROYED;
@@ -111,11 +116,14 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		void *tmp_data = realloc(
 		    vec->data, Vec_idx_to_bytes(vec, vec->capacity - removed)
 		);
-		if (!tmp_data) return CCOLL_NO_REMOVED_MEMORY;
+		if (!tmp_data)
+			return canceled
+				     ? CCOLL_SUCCESS_WITH_NO_REMOVED_MEMORY
+				     : CCOLL_SUCCESS_WITH_NO_REMOVED_MEMORY_WITH_CANCELED;
 		vec->capacity -= removed;
 		vec->data = tmp_data;
 
-		return CCOLL_SUCCESS;
+		return canceled ? CCOLL_SUCCESS_WITH_CANCELED : CCOLL_SUCCESS;
 	} else {
 		// TODO: consider better use of variables in memmove like range
 		// etc...

@@ -37,8 +37,6 @@ int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 }
 
 // TODO:TEST: Make test for that foo
-// TODO: change docs for that foo to tell that vec should be uninitialized and
-// NULL
 int Vec_split_clone(
     const Vec *base, Vec **new_vec1, Vec **new_vec2, const size_t idx
 ) {

@@ -60,6 +60,7 @@ int Vec_set_range(
 	}
 
 	size_t omitted = 0;
+	bool canceled  = false;
 	if (vec->on_remove) {
 		for (size_t i = start_idx; i < start_idx + quantity; i++) {
 			switch (vec->on_remove(
@@ -67,6 +68,7 @@ int Vec_set_range(
 			    CCOLL_OPERATION_REPLACE
 			)) {
 			case CCOLL_CALLBACK_CANCEL:
+				canceled = true;
 				if (i >= vec->size) omitted++;
 				start_idx--;
 				continue;
@@ -98,6 +100,7 @@ int Vec_set_range(
 		}
 	}
 
+	if (canceled) return CCOLL_SUCCESS_WITH_CANCELED;
 	return CCOLL_SUCCESS;
 }
 
@@ -139,7 +142,6 @@ int Vec_push_front(Vec *vec, const void *data) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO: read implementation of that foo and apply to rest of range foo's
 int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
@@ -155,8 +157,8 @@ int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 	}
 
 	memcpy(
-	    vec->data + (vec->size * vec->element_size), data,
-	    quantity * vec->element_size
+	    Vec_get_unchecked(vec, vec->size), data,
+	    Vec_idx_to_bytes(vec, quantity)
 	);
 
 	vec->size += quantity;
@@ -179,10 +181,10 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 	}
 
 	memmove(
-	    vec->data + (quantity * vec->element_size), vec->data,
-	    vec->size * vec->element_size
+	    Vec_get_unchecked(vec, quantity), vec->data,
+	    Vec_idx_to_bytes(vec, vec->size)
 	);
-	memcpy(vec->data, data, quantity * vec->element_size);
+	memcpy(vec->data, data, Vec_idx_to_bytes(vec, quantity));
 
 	vec->size += quantity;
 
@@ -201,7 +203,7 @@ int Vec_insert(Vec *vec, const size_t idx, const void *data) {
 	}
 
 	memmove(
-	    Vec_get_unchecked(vec, idx + 1), Vec_get(vec, idx),
+	    Vec_get_unchecked(vec, idx + 1), Vec_get_unchecked(vec, idx),
 	    Vec_idx_to_bytes(vec, vec->size - idx)
 	);
 	memcpy(Vec_get_unchecked(vec, idx), data, Vec_idx_to_bytes(vec, 1));
@@ -218,7 +220,7 @@ int Vec_insert_range(
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
-	if (vec->size + quantity - start_idx > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (start_idx + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 

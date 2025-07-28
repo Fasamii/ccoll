@@ -25,6 +25,10 @@ or
 make all # build's all .a files
 ```
 # overall TODO's
+- [ ] consider making free foos not free and remove elements but only free you would have to remove
+  range and element variant and make instead free amount variant and plain free
+- [ ] change foos that are returning Vec and not Initializing it to use **new or **void (maybe
+(think about it))
 - [ ] write implementation of: linked list, ring linked list, ring vec, queue, stack
 - [ ] make API more consistent
 - [ ] make get foo's have variants like get last and first

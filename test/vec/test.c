@@ -510,16 +510,9 @@ void TEST_after_fn() {
 	    clicked == 4 + 7, "Callback function should increase click variable"
 	);
 
-	Vec_free_range(vec, 0, 2);
-	// The shrink above ensure vec will have exactly 7 element's
-	assert_eq(
-	    clicked == 4 + 7 + 2,
-	    "Callback function should increase click variable"
-	);
-
 	Vec_free(vec);
 	assert_eq(
-	    clicked == 4 + 7 + 2 + 5,
+	    clicked == 4 + 7 + 7,
 	    "Callback function should increase click variable"
 	);
 }
