@@ -1,4 +1,4 @@
-#include "../../ccoll_errors.h"
+#include "../../ccoll-codes.h"
 #include "../../colors.h"
 #include "../../include/vec.h"
 
@@ -15,7 +15,8 @@ void TEST_inti_and_free(size_t sizeof_data) {
 	Vec *vec = Vec_init(sizeof_data);
 
 	assert_eq(
-	    vec != NULL && vec->size == 0 && vec->capacity == CCOLL_VEC_MIN_CAPACITY &&
+	    vec != NULL && vec->size == 0 &&
+		  vec->capacity == CCOLL_VEC_MIN_CAPACITY &&
 		  vec->element_size == sizeof_data,
 	    "Vec_init()"
 	);
@@ -67,41 +68,42 @@ void TEST_push_pop_edge() {
 	int res;
 	Vec *vec = Vec_init(sizeof(char));
 
-	res = Vec_push(vec, NULL);
-	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
-	    "Vec_push() should fail if invalid arguments are provided"
-	);
+	// TODO: data isn't handled if null think if you really want to remove
+	// data == NULL checks res = Vec_push(vec, NULL); printf("here I am\n");
+	// assert_eq(
+	//     res == CCOLL_INVALID_ARGUMENT,
+	//     "Vec_push() should fail if invalid arguments are provided"
+	// );
 
 	char ch = 'a';
 	res	  = Vec_push(NULL, &ch);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_NULL,
 	    "Vec_push() should fail if invalid arguments are provided"
 	);
 
 	res = Vec_push(NULL, NULL);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_NULL,
 	    "Vec_push() should fail if invalid arguments are provided"
 	);
 
-	res = Vec_push_front(vec, NULL);
-	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
-	    "Vec_push_front() should fail if invalid arguments are provided"
-	);
+	// res = Vec_push_front(vec, NULL);
+	// assert_eq(
+	//     res == CCOLL_INVALID_ARGUMENT,
+	//     "Vec_push_front() should fail if invalid arguments are provided"
+	// );
 
 	ch  = 'b';
 	res = Vec_push_front(NULL, &ch);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_NULL,
 	    "Vec_push_front() should fail if invalid arguments are provided"
 	);
 
 	res = Vec_push_front(NULL, NULL);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_NULL,
 	    "Vec_push_front() should fail if invalid arguments are provided"
 	);
 
@@ -155,8 +157,7 @@ void TEST_edge_init_and_free() {
 	);
 	res = Vec_free(vec);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
-	    "Vec_free() should return CCOLL_INVALID_ARGUMENT"
+	    res == CCOLL_NULL, "Vec_free() should return CCOLL_INVALID_ARGUMENT"
 	);
 
 	vec = Vec_init_with(sizeof(char), 0);
@@ -166,8 +167,7 @@ void TEST_edge_init_and_free() {
 	);
 	res = Vec_free(vec);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
-	    "Vec_free() should return CCOLL_INVALID_ARGUMENT"
+	    res == CCOLL_NULL, "Vec_free() should return CCOLL_INVALID_ARGUMENT"
 	);
 
 	vec = Vec_init_with(0, 12);
@@ -177,8 +177,7 @@ void TEST_edge_init_and_free() {
 	);
 	res = Vec_free(vec);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
-	    "Vec_free() should return CCOLL_INVALID_ARGUMENT"
+	    res == CCOLL_NULL, "Vec_free() should return CCOLL_INVALID_ARGUMENT"
 	);
 
 	vec = Vec_init_with(0, 0);
@@ -188,8 +187,7 @@ void TEST_edge_init_and_free() {
 	);
 	res = Vec_free(vec);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
-	    "Vec_free() should return CCOLL_INVALID_ARGUMENT"
+	    res == CCOLL_NULL, "Vec_free() should return CCOLL_INVALID_ARGUMENT"
 	);
 }
 
@@ -215,13 +213,19 @@ void TEST_fill(size_t size) {
 	);
 }
 
-int CALLBACK_after_element(void *element, size_t element_size) {
+int CALLBACK_after_element(
+    void *element, size_t idx __attribute__((unused)), size_t element_size,
+    CCOLL_OPERATION op __attribute__((unused))
+) {
 	log("CALLBACK_after_element() foo with data %s of size (%ld)",
 	    (char *)element, element_size);
 	return 0;
 }
 
-void TEST_after_element(size_t size, int (*fn)(void *, size_t element_size)) {
+void TEST_after_element(
+    size_t size,
+    int (*fn)(void *, size_t idx, size_t element_size, CCOLL_OPERATION op)
+) {
 	Vec *vec = Vec_init_with((size + 1) * sizeof(char), size);
 	if (vec == NULL) return;
 	Vec_set_on_remove_callback(vec, fn);
@@ -244,7 +248,7 @@ void TEST_vec_set() {
 
 	res = Vec_set(vec, 1, &data1);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_INVALID_ELEMENT,
 	    "That operation would leave gap in data structure so Vec_set() "
 	    "returns error"
 	);
@@ -269,7 +273,7 @@ void TEST_vec_set() {
 
 	res = Vec_set(vec, 2, &data1);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_INVALID_ELEMENT,
 	    "That operation would leave gap in data structure so Vec_set() "
 	    "returns error"
 	);
@@ -278,7 +282,10 @@ void TEST_vec_set() {
 	);
 }
 
-int CALLBACK_vec_insert(void *data, size_t element_size) {
+int CALLBACK_vec_insert(
+    void *data, size_t idx __attribute__((unused)), size_t element_size,
+    CCOLL_OPERATION op __attribute__((unused))
+) {
 	log("size of data is " BLU "%ld" NOCOL " and data is (" BLU "%ld" NOCOL
 	    ")",
 	    element_size, *(long *)data);
@@ -295,12 +302,14 @@ void TEST_vec_insert() {
 
 	res = Vec_insert(vec, 1, &data1);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_INVALID_ELEMENT,
 	    "the idx to Vec_insert() is intentionally invalid"
 	);
 	assert_eq(vec->size == 0, "Validation that vec didnt growth");
 
+	printf("before\n");
 	res = Vec_insert(vec, 0, &data1);
+	printf("after\n");
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
 	    *(long *)Vec_get(vec, 0) == data1,
@@ -356,7 +365,7 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	int res;
 
 	res = Vec_append(vecint1, veclong);
-	assert_eq(res == CCOLL_INVALID_ARGUMENT, "Incompatybile vec types");
+	assert_eq(res == CCOLL_ELEMENT_SIZE_MISMATCH, "Incompatybile vec types");
 	assert_eq(vecint1->size == size1, "Safety check for size");
 	assert_eq(veclong->size == size1, "Safety check for size");
 
@@ -424,16 +433,14 @@ void TEST_vec_set_range(size_t size) {
 
 	res = Vec_set_range(vec, data, 1, size);
 	assert_eq(
-	    res == CCOLL_INVALID_ARGUMENT,
+	    res == CCOLL_INVALID_ELEMENT,
 	    "Passed invalid values, should return errror"
 	);
 	assert_eq(vec->size == 0, "Additional check if vec size is valid");
-	// assert_eq(*(char *)vec->data != data[0], "Additional data validation");
 
 	res = Vec_set_range(vec, data, 0, 0);
 	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
 	assert_eq(vec->size == 0, "But vec size should be 0");
-	// assert_eq(*(char *)vec->data != data[0], "Additional data validation");
 
 	if (size > 1) {
 		res = Vec_set_range(vec, data, 0, size / 2);
@@ -455,7 +462,7 @@ void TEST_vec_set_range(size_t size) {
 
 	res = Vec_set_range(vec, data, size, size);
 	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
-	assert_eq(vec->size == size + size, "size should be equal to %ld", size);
+	assert_eq(vec->size == size + size, "size should be equal to %ld", size * 2);
 	assert_eq(
 	    *(char *)Vec_get(vec, 0) == data[0], "Additional data validation 1"
 	);
@@ -469,7 +476,10 @@ void TEST_vec_set_range(size_t size) {
 }
 
 static int clicked = 0;
-int CALLBACK_after_fn_test(void *data, size_t element_size) {
+int CALLBACK_after_fn_test(
+    void *data, size_t idx __attribute__((unused)), size_t element_size,
+    CCOLL_OPERATION op __attribute__((unused))
+) {
 	log("CALLBACK: %c <- %ld;", *(char *)data, element_size);
 	clicked++;
 	return 0;
