@@ -1,4 +1,4 @@
-#include "../../ccoll_errors.h"
+#include "../../ccoll-codes.h"
 #include "../../colors.h"
 #include "../../include/vec.h"
 
