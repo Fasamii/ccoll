@@ -84,16 +84,31 @@ int Vec_split_clone(
 	return CCOLL_SUCCESS;
 }
 
+int Vec_slice(Vec *vec, size_t from_idx, size_t to_idx) {
+	if (!vec) return CCOLL_NULL;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (from_idx > to_idx) return CCOLL_INVALID_RANGE;
+	if (to_idx >= vec->size) return CCOLL_INVALID_ELEMENT;
+
+	size_t slice_size = to_idx - from_idx;
+
+	memmove(
+		Vec_get_unchecked(vec, 0),
+		Vec_get_unchecked(vec, from_idx),
+		Vec_idx_to_bytes(vec, slice_size)
+	);
+
+	vec->size = slice_size;
+
+	return CCOLL_SUCCESS;
+}
+
 // TODO:TEST: Make test for that foo
-Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx) {
+Vec *Vec_slice_clone(const Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
 	if (from_idx > to_idx) return NULL;
 	if (to_idx >= vec->size) return NULL;
-
-	// TODO: consider removing and check if it is safe to cast size_t to int
-	if ((int)from_idx < 0) from_idx = vec->size + from_idx;
-	if ((int)to_idx < 0) to_idx = vec->size + to_idx;
 
 	size_t slice_size = to_idx - from_idx;
 

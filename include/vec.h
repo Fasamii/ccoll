@@ -308,6 +308,8 @@ int Vec_remove(Vec *vec, const size_t idx);
 // - CCOLL_INVALID_ARGUMENT
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
+// TODO: vec remove entire
+
 ////////////////
 // VEC-TO-VEC //
 ////////////////
@@ -348,7 +350,7 @@ int Vec_split_clone(
 // Returns:
 // - Pointer to slice of Vec
 // - NULL on failure
-Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx);
+Vec *Vec_slice_clone(const Vec *vec, size_t from_idx, size_t to_idx);
 
 //////////
 // UTIL //
