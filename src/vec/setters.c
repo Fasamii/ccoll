@@ -108,7 +108,8 @@ int Vec_append(Vec *base, const Vec *vec) {
 
 	// TODO: check if that base operations and pointer calculations are safe
 	memcpy(
-	    base->data + (base->size * base->element_size), vec->data, Vec_idx_to_bytes(vec, vec->size)
+	    base->data + (base->size * base->element_size), vec->data,
+	    Vec_idx_to_bytes(vec, vec->size)
 	);
 
 	base->size += vec->size;
@@ -174,7 +175,9 @@ int Vec_set_range(
 				if (i >= vec->size) omitted++;
 				start_idx--;
 				continue;
-			case CCOLL_CALLBACK_DESTROY_VEC: Vec_free(vec); return CCOLL_DESTROYED;
+			case CCOLL_CALLBACK_DESTROY_VEC:
+				Vec_free(vec);
+				return CCOLL_DESTROYED;
 			case CCOLL_CALLBACK_NOTHING:
 				memcpy(
 				    vec->data + (i * vec->element_size),
