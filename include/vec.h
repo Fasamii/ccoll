@@ -33,23 +33,6 @@
  *	Vec_push(vec, t);
  */
 
-// TODO: redo errors
-// TODO: after making other ccoll's make sure that errors are consistent
-
-// #ifndef CCOLL_ERROR_CODES_H
-// #define CCOLL_ERROR_CODES_H
-//
-// #define CCOLL_SUCCESS 0
-// #define CCOLL_ERROR -1
-// #define CCOLL_INVALID_ARGUMENT -3
-// #define CCOLL_OUT_OF_MEMORY -2
-// #define CCOLL_NOT_ENOUGH_MEMORY_REQUESTED -4
-// #define CCOLL_EMPTY -6
-// #define CCOLL_PASSED_FOO_FAIL -7
-// #define CCOLL_PASSED_FOO_FAIL_CONTINUED 7
-//
-// #endif
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/types.h>
