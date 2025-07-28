@@ -308,7 +308,8 @@ int Vec_remove(Vec *vec, const size_t idx);
 // - CCOLL_INVALID_ARGUMENT
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
-// TODO: vec remove entire
+// TODO: docs
+int Vec_remove_all(Vec *vec);
 
 ////////////////
 // VEC-TO-VEC //
