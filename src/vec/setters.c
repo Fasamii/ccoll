@@ -8,7 +8,8 @@
 
 int Vec_set(Vec *vec, const size_t idx, const void *data) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	if (idx > vec->size) return CCOLL_INVALID_ELEMENT;
 	if (idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
@@ -41,7 +42,8 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 
 int Vec_push(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	if (vec->size + 1 > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->capacity == vec->size) {
@@ -57,7 +59,8 @@ int Vec_push(Vec *vec, const void *data) {
 
 int Vec_push_front(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	if (vec->size + 1 > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->capacity <= vec->size) {
@@ -77,7 +80,8 @@ int Vec_push_front(Vec *vec, const void *data) {
 
 int Vec_insert(Vec *vec, const size_t idx, const void *data) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	if (idx > vec->size) return CCOLL_INVALID_ELEMENT;
 	if (idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
@@ -97,7 +101,7 @@ int Vec_insert(Vec *vec, const size_t idx, const void *data) {
 
 int Vec_append(Vec *base, const Vec *vec) {
 	if (!base || !vec) return CCOLL_NULL;
-	if (!base->data || !vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (base->size + vec->size > SIZE_MAX) return CCOLL_OVERFLOW;
 	if (base->element_size != vec->element_size)
 		return CCOLL_ELEMENT_SIZE_MISMATCH;
@@ -150,7 +154,8 @@ int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 ) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
 	// TODO:TEST: check if that is correct
 	if (start_idx + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
@@ -211,7 +216,8 @@ int Vec_insert_range(
     Vec *vec, const void *data, const size_t start_idx, const size_t quantity
 ) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
 	if (vec->size + quantity - start_idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
@@ -240,7 +246,8 @@ int Vec_insert_range(
 // TODO: read implementation of that foo and apply to rest of range foo's
 int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	// TODO: check if you need both checks
 	if (quantity > SIZE_MAX) return CCOLL_OVERFLOW;
 	if (vec->size + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
@@ -263,7 +270,8 @@ int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 
 int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 	// TODO: check if you need both checks
 	if (quantity > SIZE_MAX) return CCOLL_OVERFLOW;
 	if (vec->size + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
@@ -287,7 +295,8 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 
 int Vec_fill(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
+	if (!data) return CCOLL_NULL_DATA;
 
 	if (vec->on_remove) {
 		for (size_t i = 0; i < vec->size; i++) {

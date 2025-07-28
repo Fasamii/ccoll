@@ -43,7 +43,7 @@ void *Vec_pop_front(Vec *vec) {
 // TODO:TEST: Make test for that foo
 int Vec_remove(Vec *vec, const size_t idx) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (vec->size == 0) return CCOLL_EMPTY;
 	if (idx >= vec->size) return CCOLL_INVALID_ELEMENT;
 
@@ -74,7 +74,7 @@ int Vec_remove(Vec *vec, const size_t idx) {
 // TODO:IMPORTANT:TEST: that foo
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (vec->size == 0) return CCOLL_EMPTY;
 	if (to_idx >= from_idx) return CCOLL_INVALID_ELEMENT;
 	if (to_idx > vec->size) return CCOLL_INVALID_RANGE;

@@ -11,7 +11,7 @@
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 	if (!base) return CCOLL_NULL;
 	if (!new_vec) return CCOLL_NULL;
-	if (!base->data) return CCOLL_NULL_DATA;
+	if (!base->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (idx > base->size) return CCOLL_INVALID_ELEMENT;
 
 	Vec *new;
@@ -45,7 +45,7 @@ int Vec_split_clone(
 	if (!base) return CCOLL_NULL;
 	if (!new_vec1) return CCOLL_NULL;
 	if (!new_vec2) return CCOLL_NULL;
-	if (!base->data) return CCOLL_NULL_DATA;
+	if (!base->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (idx > base->size) return CCOLL_INVALID_ELEMENT;
 
 	Vec *new1;
@@ -121,7 +121,7 @@ Vec *Vec_slice(const Vec *vec, size_t from_idx, size_t to_idx) {
 // TODO:TEST: Make test for that foo
 int Vec_swap(Vec *vec, size_t idx1, size_t idx2) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (idx1 >= vec->size) return CCOLL_INVALID_ELEMENT;
 	if (idx2 >= vec->size) return CCOLL_INVALID_ELEMENT;
 

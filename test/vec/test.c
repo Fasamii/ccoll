@@ -68,12 +68,12 @@ void TEST_push_pop_edge() {
 	int res;
 	Vec *vec = Vec_init(sizeof(char));
 
-	// TODO: data isn't handled if null think if you really want to remove
-	// data == NULL checks res = Vec_push(vec, NULL); printf("here I am\n");
-	// assert_eq(
-	//     res == CCOLL_INVALID_ARGUMENT,
-	//     "Vec_push() should fail if invalid arguments are provided"
-	// );
+	res = Vec_push(vec, NULL);
+	printf("here I am\n");
+	assert_eq(
+	    res == CCOLL_NULL_DATA,
+	    "Vec_push() should fail if invalid arguments are provided"
+	);
 
 	char ch = 'a';
 	res	  = Vec_push(NULL, &ch);
@@ -88,11 +88,11 @@ void TEST_push_pop_edge() {
 	    "Vec_push() should fail if invalid arguments are provided"
 	);
 
-	// res = Vec_push_front(vec, NULL);
-	// assert_eq(
-	//     res == CCOLL_INVALID_ARGUMENT,
-	//     "Vec_push_front() should fail if invalid arguments are provided"
-	// );
+	res = Vec_push_front(vec, NULL);
+	assert_eq(
+	    res == CCOLL_NULL_DATA,
+	    "Vec_push_front() should fail if invalid arguments are provided"
+	);
 
 	ch  = 'b';
 	res = Vec_push_front(NULL, &ch);

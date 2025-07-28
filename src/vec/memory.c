@@ -7,7 +7,7 @@
 
 int Vec_reserve(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 
 	size_t toalloc = vec->size + idxs;
 	if (toalloc <= vec->capacity) return CCOLL_SUCCESS;
@@ -25,7 +25,7 @@ int Vec_reserve(Vec *vec, const size_t idxs) {
 // IMPORTANT:TEST: that foo
 int Vec_reserve_entire(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (idxs < vec->size) return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
 
 	if (idxs <= vec->capacity) return CCOLL_SUCCESS;
@@ -41,7 +41,7 @@ int Vec_reserve_entire(Vec *vec, const size_t idxs) {
 // TODO:TEST: Make test for that foo
 int Vec_alloc(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 
 	void *tmp_data =
 	    realloc(vec->data, Vec_idx_to_bytes(vec, vec->capacity + idxs));
@@ -55,7 +55,7 @@ int Vec_alloc(Vec *vec, const size_t idxs) {
 
 int Vec_free(Vec *vec) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 
 	if (vec->on_remove) {
 		for (size_t i = 0; i < vec->size; i++) {
@@ -77,7 +77,7 @@ int Vec_free(Vec *vec) {
 
 int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (from_idx > to_idx) return CCOLL_INVALID_RANGE;
 	if (to_idx >= vec->size) return CCOLL_INVALID_ELEMENT;
 
@@ -145,7 +145,7 @@ int Vec_free_range(Vec *vec, size_t from_idx, size_t to_idx) {
 // TODO:TEST: Make test for that foo
 int Vec_free_element(Vec *vec, size_t idx) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (idx >= vec->size) return CCOLL_INVALID_ELEMENT;
 
 	if (vec->on_remove) {
@@ -178,7 +178,7 @@ int Vec_free_element(Vec *vec, size_t idx) {
 
 int Vec_shrink(Vec *vec) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 
 	void *tmp_data = realloc(vec->data, (vec->size * vec->element_size));
 	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
@@ -191,7 +191,7 @@ int Vec_shrink(Vec *vec) {
 // TODO:TEST: Make test for that foo
 int Vec_shrink_to(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_DATA;
+	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (idxs < vec->size) return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
 
 	void *tmp_data = realloc(vec->data, idxs * vec->element_size);
