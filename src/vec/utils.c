@@ -91,8 +91,8 @@ int Vec_slice(Vec *vec, size_t from_idx, size_t to_idx) {
 	size_t slice_size = to_idx - from_idx;
 
 	memmove(
-		Vec_get_unchecked(vec, 0),
-		Vec_get_unchecked(vec, from_idx),
+		Vec_get_unchecked_ptr(vec, 0),
+		Vec_get_unchecked_ptr(vec, from_idx),
 		Vec_idx_to_bytes(vec, slice_size)
 	);
 

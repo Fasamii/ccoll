@@ -63,9 +63,6 @@ typedef struct Vec {
 // Calculates how much idxs will fit in specified amount of idxs
 #define Vec_bytes_to_idx(vec, idxs) ((idxs) / (vec)->element_size)
 
-// TODO: make copy / pointer variants of foo's
-// TODO: make unchecked variant of foo's
-
 //////////
 // INIT //
 //////////
@@ -206,27 +203,46 @@ int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 );
 
-// Gets the element from specified index
+// Gets pointer to element at specified idx
 //
 // Returns:
 // - pointer to data
 // - undefined behavior
-static inline void *Vec_get_unchecked(const Vec *vec, const size_t idx) {
+static inline void *Vec_get_unchecked_ptr(const Vec *vec, const size_t idx) {
 	return (char *)vec->data + (idx * vec->element_size);
 }
 
-// Returns pointer to data at specified Vec index
+// Gets pointer to element at specified idx and rus checks if provided data is
+// valid
 //
 // Returns:
 // - pointer to data
 // - NULL on failure
-static inline void *Vec_get(const Vec *vec, const size_t idx) {
+static inline void *Vec_get_ptr(const Vec *vec, const size_t idx) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
 	if (idx >= vec->size) return NULL;
 
-	return Vec_get_unchecked(vec, idx);
+	return Vec_get_unchecked_ptr(vec, idx);
 }
+
+// Clones vec element from specified idx and returns pointer to it
+//
+// Returns:
+// - pointer to data
+// - undefined behavior
+//
+// !! You are responsible for freeing returned data !!
+void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx);
+
+// Clones vec element from specified idx and returns pointer to it
+//
+// Returns:
+// - Pointer to data
+// - NULL on failure
+//
+// !! You are responsible for freeing returned data !!
+void *Vec_get_clone(const Vec *vec, const size_t idx);
 
 ////////////////
 // VEC-POS-IO //
@@ -281,6 +297,8 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity);
 // Returns:
 // - Pointer to data
 // - NULL on failure
+//
+// !! You are responsible for freeing returned data !!
 void *Vec_pop(Vec *vec);
 
 // Pop's data from the beginning and returns pointer to it
@@ -288,6 +306,8 @@ void *Vec_pop(Vec *vec);
 // Returns:
 // - Pointer to data
 // - NULL on failure
+//
+// !! You are responsible for freeing returned data !!
 void *Vec_pop_front(Vec *vec);
 
 ////////////////
@@ -465,7 +485,7 @@ int Vec_for_each(
 // Functional fashion foo that filters out which elements to clone to new
 // Vec
 //
-// Returns: 
+// Returns:
 // - Vec that was created from filtered elements
 // - NULL on failure
 Vec *Vec_filter(

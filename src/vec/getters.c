@@ -6,6 +6,23 @@
 #include "../../ccoll-codes.h"
 #include "../../include/vec.h"
 
+void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx) {
+	void *data = malloc(vec->element_size);
+	if (!data) return NULL;
+
+	memcpy(data, Vec_get_unchecked_ptr(vec, idx), Vec_idx_to_bytes(vec, 1));
+
+	return data;
+}
+
+void *Vec_get_clone(const Vec *vec, const size_t idx) {
+	if (!vec) return NULL;
+	if (!vec->data) return NULL;
+	if (idx >= vec->size) return NULL;
+
+	return Vec_get_clone_unchecked(vec, idx);
+}
+
 void *Vec_pop(Vec *vec) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
@@ -50,7 +67,7 @@ int Vec_remove(Vec *vec, const size_t idx) {
 
 	if (vec->on_remove) {
 		switch (vec->on_remove(
-		    Vec_get_unchecked(vec, idx), idx, vec->element_size,
+		    Vec_get_unchecked_ptr(vec, idx), idx, vec->element_size,
 		    CCOLL_OPERATION_REMOVE
 		)) {
 		case CCOLL_CALLBACK_NOTHING: break;
@@ -86,7 +103,7 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		Vec *omitted  = Vec_init_with(sizeof(size_t), range);
 		for (size_t i = from_idx; i < to_idx; i++) {
 			switch (vec->on_remove(
-			    Vec_get_unchecked(vec, i), i, vec->element_size,
+			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REMOVE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
@@ -106,7 +123,8 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		while (omitted->size > 0) {
 			size_t idx = *(size_t *)Vec_pop_front(omitted);
 			memmove(
-			    Vec_get_unchecked(vec, idx), Vec_get_unchecked(vec, idx + 1),
+			    Vec_get_unchecked_ptr(vec, idx),
+			    Vec_get_unchecked_ptr(vec, idx + 1),
 			    Vec_idx_to_bytes(vec, vec->size - idx)
 			);
 		}
@@ -128,7 +146,8 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 		// TODO: consider better use of variables in memmove like range
 		// etc...
 		memmove(
-		    Vec_get_unchecked(vec, from_idx), Vec_get_unchecked(vec, to_idx),
+		    Vec_get_unchecked_ptr(vec, from_idx),
+		    Vec_get_unchecked_ptr(vec, to_idx),
 		    Vec_idx_to_bytes(vec, vec->size - to_idx)
 		);
 

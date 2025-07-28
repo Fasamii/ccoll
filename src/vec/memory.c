@@ -58,7 +58,7 @@ int Vec_free(Vec *vec) {
 	if (vec->on_remove) {
 		for (size_t i = 0; i < vec->size; i++) {
 			vec->on_remove(
-			    Vec_get_unchecked(vec, i), i, vec->element_size,
+			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REMOVE_FORCED
 			);
 		}

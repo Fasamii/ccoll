@@ -15,13 +15,13 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 
 	if (idx == vec->size) {
 		if (Vec_alloc(vec, 1)) return CCOLL_OUT_OF_MEMORY;
-		memcpy(Vec_get_unchecked(vec, idx), data, Vec_idx_to_bytes(vec, 1));
+		memcpy(Vec_get_unchecked_ptr(vec, idx), data, Vec_idx_to_bytes(vec, 1));
 		vec->size++;
 		return CCOLL_SUCCESS;
 	} else {
 		if (vec->on_remove) {
 			switch (vec->on_remove(
-			    Vec_get_unchecked(vec, idx), idx, vec->element_size,
+			    Vec_get_unchecked_ptr(vec, idx), idx, vec->element_size,
 			    CCOLL_OPERATION_REPLACE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
@@ -64,7 +64,7 @@ int Vec_set_range(
 	if (vec->on_remove) {
 		for (size_t i = start_idx; i < start_idx + quantity; i++) {
 			switch (vec->on_remove(
-			    Vec_get_unchecked(vec, i), i, vec->element_size,
+			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REPLACE
 			)) {
 			case CCOLL_CALLBACK_CANCEL:
@@ -78,7 +78,7 @@ int Vec_set_range(
 			case CCOLL_CALLBACK_NOTHING:
 			default:
 				memcpy(
-				    Vec_get_unchecked(vec, i),
+				    Vec_get_unchecked_ptr(vec, i),
 				    // TODO: think how to make below line more nice for
 				    // the eye
 				    data + ((i - start_idx) * vec->element_size),
@@ -92,7 +92,7 @@ int Vec_set_range(
 		}
 	} else {
 		memcpy(
-		    Vec_get_unchecked(vec, start_idx), data,
+		    Vec_get_unchecked_ptr(vec, start_idx), data,
 		    Vec_idx_to_bytes(vec, quantity)
 		);
 		if (end_idx >= vec->size) {
@@ -157,7 +157,7 @@ int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 	}
 
 	memcpy(
-	    Vec_get_unchecked(vec, vec->size), data,
+	    Vec_get_unchecked_ptr(vec, vec->size), data,
 	    Vec_idx_to_bytes(vec, quantity)
 	);
 
@@ -181,7 +181,7 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 	}
 
 	memmove(
-	    Vec_get_unchecked(vec, quantity), vec->data,
+	    Vec_get_unchecked_ptr(vec, quantity), vec->data,
 	    Vec_idx_to_bytes(vec, vec->size)
 	);
 	memcpy(vec->data, data, Vec_idx_to_bytes(vec, quantity));
@@ -203,10 +203,10 @@ int Vec_insert(Vec *vec, const size_t idx, const void *data) {
 	}
 
 	memmove(
-	    Vec_get_unchecked(vec, idx + 1), Vec_get_unchecked(vec, idx),
+	    Vec_get_unchecked_ptr(vec, idx + 1), Vec_get_unchecked_ptr(vec, idx),
 	    Vec_idx_to_bytes(vec, vec->size - idx)
 	);
-	memcpy(Vec_get_unchecked(vec, idx), data, Vec_idx_to_bytes(vec, 1));
+	memcpy(Vec_get_unchecked_ptr(vec, idx), data, Vec_idx_to_bytes(vec, 1));
 	vec->size++;
 
 	return CCOLL_SUCCESS;
@@ -301,14 +301,14 @@ int Vec_fill(Vec *vec, const void *data) {
 	if (vec->on_remove) {
 		for (size_t i = 0; i < vec->size; i++) {
 			vec->on_remove(
-			    Vec_get_unchecked(vec, i), i, vec->element_size,
+			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REPLACE_FORCED
 			);
 		}
 	}
 
 	for (size_t i = 0; i < vec->capacity; i++) {
-		memcpy(Vec_get_unchecked(vec, i), data, Vec_idx_to_bytes(vec, 1));
+		memcpy(Vec_get_unchecked_ptr(vec, i), data, Vec_idx_to_bytes(vec, 1));
 	}
 
 	vec->size = vec->capacity;

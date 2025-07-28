@@ -292,7 +292,7 @@ int CALLBACK_vec_insert(
 	return CCOLL_SUCCESS;
 }
 
-// Covers: Vec_get(), Vec_insert(), Vec_set_after_callback(), Vec_free()
+// Covers: Vec_get_ptr(), Vec_insert(), Vec_set_after_callback(), Vec_free()
 void TEST_vec_insert() {
 	Vec *vec   = Vec_init(sizeof(long));
 	long data1 = 123123;
@@ -312,29 +312,29 @@ void TEST_vec_insert() {
 	printf("after\n");
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
-	    *(long *)Vec_get(vec, 0) == data1,
-	    "Validation check if data is correct (%ld)", *(long *)Vec_get(vec, 0)
+	    *(long *)Vec_get_ptr(vec, 0) == data1,
+	    "Validation check if data is correct (%ld)", *(long *)Vec_get_ptr(vec, 0)
 	);
 
 	res = Vec_insert(vec, 0, &data2);
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
-	    *(long *)Vec_get(vec, 0) == data2,
-	    "Validation check if data is correct (%ld)", *(long *)Vec_get(vec, 0)
+	    *(long *)Vec_get_ptr(vec, 0) == data2,
+	    "Validation check if data is correct (%ld)", *(long *)Vec_get_ptr(vec, 0)
 	);
 
 	res = Vec_insert(vec, 1, &data3);
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
-	    *(long *)Vec_get(vec, 1) == data3,
-	    "Validation check if data is correct (%ld)", *(long *)Vec_get(vec, 1)
+	    *(long *)Vec_get_ptr(vec, 1) == data3,
+	    "Validation check if data is correct (%ld)", *(long *)Vec_get_ptr(vec, 1)
 	);
 
 	Vec_shrink(vec);
 
-	assert_eq(*(long *)Vec_get(vec, 0) == data2, "Data integrity check");
-	assert_eq(*(long *)Vec_get(vec, 1) == data3, "Data integrity check");
-	assert_eq(*(long *)Vec_get(vec, 2) == data1, "Data integrity check");
+	assert_eq(*(long *)Vec_get_ptr(vec, 0) == data2, "Data integrity check");
+	assert_eq(*(long *)Vec_get_ptr(vec, 1) == data3, "Data integrity check");
+	assert_eq(*(long *)Vec_get_ptr(vec, 2) == data1, "Data integrity check");
 
 	Vec_set_on_remove_callback(vec, CALLBACK_vec_insert);
 	Vec_free(vec);
@@ -373,8 +373,8 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
 	assert_eq(vecint1->size == (size1 + size1), "Safety check for size");
 	assert_eq(
-	    (*(int *)Vec_get(vecint1, 0) == ai) &&
-		  (*(int *)Vec_get(vecint1, size1) == ai),
+	    (*(int *)Vec_get_ptr(vecint1, 0) == ai) &&
+		  (*(int *)Vec_get_ptr(vecint1, size1) == ai),
 	    "data integrity check"
 	);
 
@@ -382,8 +382,8 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
 	assert_eq(vecchar2->size == (size1 + size2), "Safety check for size");
 	assert_eq(
-	    (*(char *)Vec_get(vecchar2, 0) == bc) &&
-		  (*(char *)Vec_get(vecchar2, size2) == ac),
+	    (*(char *)Vec_get_ptr(vecchar2, 0) == bc) &&
+		  (*(char *)Vec_get_ptr(vecchar2, size2) == ac),
 	    "data integrity check"
 	);
 
@@ -397,8 +397,8 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	    vecint1->size == (size1 + size1 + size2), "Safety check for size"
 	);
 	assert_eq(
-	    (*(int *)Vec_get(vecint1, 0) == ai) &&
-		  (*(int *)Vec_get(vecint1, size1 + size1) == bi),
+	    (*(int *)Vec_get_ptr(vecint1, 0) == ai) &&
+		  (*(int *)Vec_get_ptr(vecint1, size1 + size1) == bi),
 	    "data integrity check"
 	);
 
@@ -406,8 +406,8 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	assert_eq(res == CCOLL_SUCCESS, "Incompatybile vec types");
 	assert_eq(veclong->size == (size1 + size1), "Safety check for size");
 	assert_eq(
-	    (*(long *)Vec_get(veclong, 0) == al) &&
-		  (*(long *)Vec_get(veclong, size1) == al),
+	    (*(long *)Vec_get_ptr(veclong, 0) == al) &&
+		  (*(long *)Vec_get_ptr(veclong, size1) == al),
 	    "data integrity check"
 	);
 
@@ -420,7 +420,7 @@ void TEST_vec_append(size_t size1, size_t size2) {
 	return;
 }
 
-// Covers: Vec_set_range(), Vec_get()
+// Covers: Vec_set_range(), Vec_get_ptr()
 void TEST_vec_set_range(size_t size) {
 	log("running with size:%ld", size);
 	Vec *vec = Vec_init_with(sizeof(char), size);
@@ -447,7 +447,7 @@ void TEST_vec_set_range(size_t size) {
 		assert_eq(res == CCOLL_SUCCESS, "should be succesful");
 		assert_eq(vec->size == (size / 2), "checking size of the vec");
 		assert_eq(
-		    *(char *)Vec_get(vec, 0) == data[0],
+		    *(char *)Vec_get_ptr(vec, 0) == data[0],
 		    "Additional data validation"
 		);
 	}
@@ -466,10 +466,10 @@ void TEST_vec_set_range(size_t size) {
 	    vec->size == size + size, "size should be equal to %ld", size * 2
 	);
 	assert_eq(
-	    *(char *)Vec_get(vec, 0) == data[0], "Additional data validation 1"
+	    *(char *)Vec_get_ptr(vec, 0) == data[0], "Additional data validation 1"
 	);
 	assert_eq(
-	    *(char *)Vec_get(vec, size) == data[0], "Additional data validation 2"
+	    *(char *)Vec_get_ptr(vec, size) == data[0], "Additional data validation 2"
 	);
 
 	Vec_free(vec);
