@@ -1,6 +1,6 @@
-#include "../../include/vec.h"
-
 #include <stddef.h>
+
+#include "../../include/vec.h"
 
 static size_t called = 0;
 

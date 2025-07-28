@@ -1,8 +1,9 @@
-#include "../../ccoll-codes.h"
-#include "../../include/vec.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../../ccoll-codes.h"
+#include "../../include/vec.h"
 
 void *Vec_pop(Vec *vec) {
 	if (!vec) return NULL;

@@ -1,7 +1,7 @@
-#include "../../include/lli.h"
-
 #include <stdlib.h>
 #include <string.h>
+
+#include "../../include/lli.h"
 
 // TODO:TEST: Make test for that foo
 Lli *Lli_init(size_t sizeof_data) {

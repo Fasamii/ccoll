@@ -1,6 +1,6 @@
 // TODO:IMPORTANT: make overflow checks for void *data in these foo's
-// TODO:IMPORTANT: rename every repleace to replace
 
+// TODO: rewrite below comment
 /*
  * Vec (Vector)
  *

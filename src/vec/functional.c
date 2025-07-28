@@ -1,7 +1,8 @@
-#include "../../ccoll-codes.h"
-#include "../../include/vec.h"
 #include <stdbool.h>
 #include <stdlib.h>
+
+#include "../../ccoll-codes.h"
+#include "../../include/vec.h"
 
 // TODO:TEST: Make test for that foo
 int Vec_for_each(

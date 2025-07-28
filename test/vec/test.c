@@ -1,14 +1,14 @@
-#include "../../ccoll-codes.h"
-#include "../../colors.h"
-#include "../../include/vec.h"
-
-#include "../util.h"
-
-#include "free-range.c"
-
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "../../include/vec.h"
+
+#include "../../ccoll-codes.h"
+#include "../../colors.h"
+#include "../util.h"
+
+#include "free-range.c"
 
 // Covers: Vec_init(), Vec_init_with(), Vec_free()
 void TEST_inti_and_free(size_t sizeof_data) {
@@ -462,7 +462,9 @@ void TEST_vec_set_range(size_t size) {
 
 	res = Vec_set_range(vec, data, size, size);
 	assert_eq(res == CCOLL_SUCCESS, "Should be succesful");
-	assert_eq(vec->size == size + size, "size should be equal to %ld", size * 2);
+	assert_eq(
+	    vec->size == size + size, "size should be equal to %ld", size * 2
+	);
 	assert_eq(
 	    *(char *)Vec_get(vec, 0) == data[0], "Additional data validation 1"
 	);

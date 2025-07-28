@@ -1,8 +1,8 @@
-#include "../colors.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include "../colors.h"
 
 #define section(name) fprintf(stdout, "\n%s\n", name);
 

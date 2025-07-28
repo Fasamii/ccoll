@@ -1,9 +1,9 @@
+#include <stddef.h>
+#include <stdlib.h>
+
 #include "../../ccoll-codes.h"
 #include "../../colors.h"
 #include "../../include/vec.h"
-
-#include <stddef.h>
-#include <stdlib.h>
 
 Vec *Vec_init(const size_t size_of_data) {
 	if (size_of_data == 0) return NULL;

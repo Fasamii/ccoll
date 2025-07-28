@@ -1,13 +1,10 @@
-#include "../../ccoll-codes.h"
-#include "../../colors.h"
-#include "../../include/vec.h"
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: remove later
-#include <stdio.h>
+#include "../../ccoll-codes.h"
+#include "../../colors.h"
+#include "../../include/vec.h"
 
 int Vec_set(Vec *vec, const size_t idx, const void *data) {
 	if (!vec) return CCOLL_NULL;
@@ -24,7 +21,7 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 		if (vec->on_remove) {
 			switch (vec->on_remove(
 			    Vec_get(vec, idx), idx, vec->element_size,
-			    CCOLL_OPERATION_REPLEACE
+			    CCOLL_OPERATION_REPLACE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
 			case CCOLL_CALLBACK_CANCEL: return CCOLL_CANCELED;
@@ -171,7 +168,7 @@ int Vec_set_range(
 		for (size_t i = start_idx; i < start_idx + quantity; i++) {
 			switch (vec->on_remove(
 			    Vec_get_unchecked(vec, i), i, vec->element_size,
-			    CCOLL_OPERATION_REPLEACE
+			    CCOLL_OPERATION_REPLACE
 			)) {
 			case CCOLL_CALLBACK_CANCEL:
 				if (i >= vec->size) omitted++;
@@ -296,7 +293,7 @@ int Vec_fill(Vec *vec, const void *data) {
 		for (size_t i = 0; i < vec->size; i++) {
 			vec->on_remove(
 			    Vec_get(vec, i), i, vec->element_size,
-			    CCOLL_OPERATION_REPLEACE_FORCED
+			    CCOLL_OPERATION_REPLACE_FORCED
 			);
 		}
 	}

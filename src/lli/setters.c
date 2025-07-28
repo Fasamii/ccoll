@@ -1,8 +1,8 @@
-#include "../../ccoll-codes.h"
-#include "../../include/lli.h"
-
 #include <stdlib.h>
 #include <string.h>
+
+#include "../../ccoll-codes.h"
+#include "../../include/lli.h"
 
 // TODO:TEST: Make test for that foo
 int Lli_set(Lli *lli, size_t idx, void *data) {

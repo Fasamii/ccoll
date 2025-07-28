@@ -44,8 +44,8 @@
 
 typedef enum CCOLL_OPERATION {
 	CCOLL_OPERATION_CREATE,		   // creating new element
-	CCOLL_OPERATION_REPLEACE,	   // replacing element
-	CCOLL_OPERATION_REPLEACE_FORCED, // replacing (unstoppable)
+	CCOLL_OPERATION_REPLACE,	   // replacing element
+	CCOLL_OPERATION_REPLACE_FORCED, // replacing (unstoppable)
 	CCOLL_OPERATION_REMOVE,		   // removing element
 	CCOLL_OPERATION_REMOVE_FORCED,   //  removing (unstoppable)
 } CCOLL_OPERATION;

@@ -1,8 +1,9 @@
-#include "../../ccoll-codes.h"
-#include "../../include/vec.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+
+#include "../../ccoll-codes.h"
+#include "../../include/vec.h"
 
 // TODO:TEST: Make test for that foo
 // TODO: change docs for that foo to tell that vec should be uninitialized and
