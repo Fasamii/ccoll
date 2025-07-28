@@ -57,9 +57,11 @@ typedef struct Vec {
 // HELPERS //
 /////////////
 
-// TODO: make docs
-#define Vec_idx_to_bytes(vec, idx) ((vec)->element_size * (idx))
-#define Vec_bytes_to_idx(vec, idx) ((idx) / (vec)->element_size)
+// Calculates how much bytes passed amount of idxs will take
+#define Vec_idx_to_bytes(vec, idxs) ((vec)->element_size * (idxs))
+
+// Calculates how much idxs will fit in specified amount of idxs
+#define Vec_bytes_to_idx(vec, idxs) ((idxs) / (vec)->element_size)
 
 // TODO: make copy / pointer variants of foo's
 // TODO: make unchecked variant of foo's
@@ -308,7 +310,12 @@ int Vec_remove(Vec *vec, const size_t idx);
 // - CCOLL_INVALID_ARGUMENT
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
-// TODO: docs
+// Removes all elements from the vec
+//
+// Returns:
+// - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
 int Vec_remove_all(Vec *vec);
 
 ////////////////
