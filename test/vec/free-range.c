@@ -1,15 +1,17 @@
 #include <stddef.h>
+#include <stdio.h>
 
 #include "../../include/vec.h"
 
 static size_t called = 0;
 
-// TODO: cover 0,1,2 return codes
 int CALLBACK_Vec_free_range(
-    void *data __attribute__((unused)), size_t idx __attribute__((unused)),
-    size_t element_size __attribute__((unused)),
-    CCOLL_OPERATION operation __attribute__((unused))
+    void *data, size_t idx, size_t element_size, CCOLL_OPERATION operation
 ) {
+	printf(
+	    "data %c at [%ld] w size: %ld done operation %d", *(char *)data, idx,
+	    element_size, operation
+	);
 	called++;
 	return 0;
 }

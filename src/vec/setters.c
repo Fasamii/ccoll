@@ -15,7 +15,9 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 
 	if (idx == vec->size) {
 		if (Vec_alloc(vec, 1)) return CCOLL_OUT_OF_MEMORY;
-		memcpy(Vec_get_unchecked_ptr(vec, idx), data, Vec_idx_to_bytes(vec, 1));
+		memcpy(
+		    Vec_get_unchecked_ptr(vec, idx), data, Vec_idx_to_bytes(vec, 1)
+		);
 		vec->size++;
 		return CCOLL_SUCCESS;
 	} else {
@@ -79,8 +81,6 @@ int Vec_set_range(
 			default:
 				memcpy(
 				    Vec_get_unchecked_ptr(vec, i),
-				    // TODO: think how to make below line more nice for
-				    // the eye
 				    data + ((i - start_idx) * vec->element_size),
 				    Vec_idx_to_bytes(vec, 1)
 				);
@@ -308,7 +308,9 @@ int Vec_fill(Vec *vec, const void *data) {
 	}
 
 	for (size_t i = 0; i < vec->capacity; i++) {
-		memcpy(Vec_get_unchecked_ptr(vec, i), data, Vec_idx_to_bytes(vec, 1));
+		memcpy(
+		    Vec_get_unchecked_ptr(vec, i), data, Vec_idx_to_bytes(vec, 1)
+		);
 	}
 
 	vec->size = vec->capacity;
