@@ -46,9 +46,6 @@ Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 	return vec;
 }
 
-// TODO: think about making struct alloc size without fn pointer and in that foo
-// realloc if then you could include some other useful foo's without growing vec
-// struct size when unneeded
 int Vec_set_on_remove_callback(
     Vec *vec,
     int (*fn)(

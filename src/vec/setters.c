@@ -11,7 +11,6 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	if (idx > vec->size) return CCOLL_INVALID_ELEMENT;
-	if (idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (idx == vec->size) {
 		if (Vec_alloc(vec, 1)) return CCOLL_OUT_OF_MEMORY;
@@ -51,7 +50,7 @@ int Vec_set_range(
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
-	if (start_idx + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (SIZE_MAX - vec->size < quantity) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -108,7 +107,7 @@ int Vec_push(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
-	if (vec->size + 1 > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (vec->size >= SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->capacity == vec->size) {
 		if (Vec_alloc(vec, vec->capacity)) return CCOLL_OUT_OF_MEMORY;
@@ -125,7 +124,7 @@ int Vec_push_front(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
-	if (vec->size + 1 > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (vec->size >= SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->capacity <= vec->size) {
 		if (Vec_alloc(vec, vec->capacity) != CCOLL_SUCCESS)
@@ -147,8 +146,7 @@ int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	// TODO: check if you need both checks
-	if (quantity > SIZE_MAX) return CCOLL_OVERFLOW;
-	if (vec->size + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (SIZE_MAX - vec->size < quantity) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -168,11 +166,8 @@ int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
 
 int Vec_push_front_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
-	// TODO: check if you need both checks
-	if (quantity > SIZE_MAX) return CCOLL_OVERFLOW;
-	if (vec->size + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (SIZE_MAX - vec->size < quantity) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -196,7 +191,6 @@ int Vec_insert(Vec *vec, const size_t idx, const void *data) {
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	if (idx > vec->size) return CCOLL_INVALID_ELEMENT;
-	if (idx > SIZE_MAX) return CCOLL_OVERFLOW;
 
 	if (vec->size >= vec->capacity) {
 		if (Vec_alloc(vec, vec->capacity)) return CCOLL_OUT_OF_MEMORY;
@@ -220,7 +214,7 @@ int Vec_insert_range(
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
-	if (start_idx + quantity > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (SIZE_MAX - vec->size < quantity) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
 
@@ -247,7 +241,7 @@ int Vec_insert_range(
 int Vec_append(Vec *base, const Vec *vec) {
 	if (!base || !vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
-	if (base->size + vec->size > SIZE_MAX) return CCOLL_OVERFLOW;
+	if (SIZE_MAX - base->size < vec->size) return CCOLL_OVERFLOW;
 	if (base->element_size != vec->element_size)
 		return CCOLL_ELEMENT_SIZE_MISMATCH;
 
@@ -271,7 +265,7 @@ int Vec_append(Vec *base, const Vec *vec) {
 Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	if (!vec1 || !vec2) return NULL;
 	if (!vec1->data || !vec2->data) return NULL;
-	if (vec1->size + vec2->size > SIZE_MAX) return NULL;
+	if (SIZE_MAX - vec1->size < vec2->size) return NULL;
 	if (vec1->element_size != vec2->element_size) return NULL;
 
 	Vec *vec = Vec_init_with(vec1->element_size, vec1->size + vec2->size);

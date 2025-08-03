@@ -89,7 +89,7 @@ int Vec_remove(Vec *vec, const size_t idx) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:IMPORTANT:TEST: that foo
+// TODO:TEST: that foo
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
@@ -143,8 +143,6 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 
 		return canceled ? CCOLL_SUCCESS_WITH_CANCELED : CCOLL_SUCCESS;
 	} else {
-		// TODO: consider better use of variables in memmove like range
-		// etc...
 		memmove(
 		    Vec_get_unchecked_ptr(vec, from_idx),
 		    Vec_get_unchecked_ptr(vec, to_idx),

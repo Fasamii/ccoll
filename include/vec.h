@@ -6,17 +6,18 @@
  * Vec — A dynamically resizable vector-like collection.
  *
  * Overview:
- * The `Vec` structure allows you to store elements of any type in a contiguous, dynamically
- * managed memory block.
+ * The `Vec` structure allows you to store elements of any type in a contiguous,
+ * dynamically managed memory block.
  *
  * Initialization:
  * You must initialize a `Vec` using one of the following functions:
  *
- * - `Vec_init(size_t elem_size)`  
+ * - `Vec_init(size_t elem_size)`
  *     Allocates a new `Vec` to store elements of the specified size in bytes.
  *
- * - `Vec_init_with(size_t elem_size, size_t capacity)`  
- *     Allocates a new `Vec` with an initial capacity (number of elements) you specify.
+ * - `Vec_init_with(size_t elem_size, size_t capacity)`
+ *     Allocates a new `Vec` with an initial capacity (number of elements) you
+ * specify.
  *
  * Cleanup:
  * After you are done using a `Vec`, you **must** free its memory using:
@@ -29,9 +30,11 @@
  *
  *     char *str = "abc"; // Null-terminated string
  *
- *     Vec_push_range(vec, str, 3); // Pushes 'a', 'b', 'c' — omits '\0' explicitly
+ *     Vec_push_range(vec, str, 3); // Pushes 'a', 'b', 'c' — omits '\0'
+ * explicitly
  *
- *     Vec_shrink(vec); // Shrinks memory to exactly fit the current element count. (4 -> 3)
+ *     Vec_shrink(vec); // Shrinks memory to exactly fit the current element
+ * count. (4 -> 3)
  *
  *     for (size_t i = 0; i < vec->size; i++) {
  *         fprintf(stdout, "%c\n", *(char *)Vec_get(vec, i));
@@ -43,8 +46,8 @@
  * - You must cast the return value of `Vec_get()` to the correct type:
  *       *(<element_type> *)Vec_get(vec, index)
  *
- * - `Vec` has more advanced features. Refer to the documentation for each function
- *   for additional capabilities.
+ * - `Vec` has more advanced features. Refer to the documentation for each
+ * function for additional capabilities.
  */
 
 #ifndef CCOLL_VEC_H
@@ -411,7 +414,8 @@ int Vec_append(Vec *base, const Vec *vec);
 Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 
 // Splits Vec into two separate Vec's at idx. Foo automatically Initializes
-// new_vecs
+// new_vecs, but if you pass already initialized make sure that it is empty or
+// you will encounter undefined behavior
 //
 // Returns:
 // - CCOLL_SUCCESS,
@@ -422,7 +426,8 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2);
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx);
 
 // Clones Vec and splits that clone  into two separate Vec's at idx. Foo
-// automatically Initializes new_vecs
+// automatically Initializes new_vecs, but if you pass already initialized make
+// sure that it is empty or you will encounter undefined behavior
 //
 // Returns:
 // - CCOLL_SUCCESS

@@ -6,8 +6,6 @@
 #include "../../include/vec.h"
 
 // TODO:TEST: Make test for that foo
-// TODO: change docs for that foo to tell that vec should be uninitialized and
-// NULL
 int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 	if (!base) return CCOLL_NULL;
 	if (!new_vec) return CCOLL_NULL;
