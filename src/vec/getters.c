@@ -92,7 +92,6 @@ int Vec_remove(Vec *vec, const size_t idx) {
 	return CCOLL_SUCCESS;
 }
 
-// TODO:TEST: that foo
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
@@ -105,83 +104,38 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 
 	if (vec->on_remove) {
 		bool canceled = false;
-		Vec *omitted  = Vec_init_with(sizeof(size_t), range);
-		for (size_t i = from_idx; i < to_idx; i++) {
+		size_t write  = from_idx;
+
+		for (size_t read = from_idx; read < to_idx; read++) {
+			void *element = Vec_get_unchecked_ptr(vec, read);
 			switch (vec->on_remove(
-			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
-			    CCOLL_OPERATION_REMOVE
+			    element, read, vec->element_size, CCOLL_OPERATION_REMOVE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
 			case CCOLL_CALLBACK_CANCEL:
 				canceled = true;
-				Vec_push(omitted, &i);
+				if (read != write) {
+					memcpy(
+					    Vec_get_unchecked_ptr(vec, write), element,
+					    Vec_idx_to_bytes(vec, 1)
+					);
+				}
+				write++;
 				break;
 			case CCOLL_CALLBACK_DESTROY_VEC:
-				Vec_free(omitted);
 				Vec_free(vec);
 				return CCOLL_DESTROYED;
 			default: break;
 			}
 		}
 
-		printf("range	count ::: ::: ::: %ld\n", range);
-		printf("om size count ::: ::: ::: %ld\n", omitted->size);
-		size_t removed = range - omitted->size;
-		printf("removed count ::: ::: ::: %ld\n", removed);
+		size_t removed = to_idx - write;
 
-		if (!Vec_is_empty(omitted)) {
-			size_t begin = 0;
-			while (omitted->size > begin) {
-				size_t idx =
-				    *(size_t *)Vec_get_unchecked_ptr(omitted, begin);
-				size_t block_size = 1;
-				while (begin + block_size < omitted->size &&
-					 *(size_t *)Vec_get_ptr(
-					     omitted, begin + block_size
-					 ) == idx + block_size) {
-					Vec_remove(omitted, 0);
-					block_size++;
-				};
-
-				memmove(
-				    Vec_get_unchecked_ptr(vec, from_idx + begin),
-				    Vec_get_unchecked_ptr(vec, idx),
-				    Vec_idx_to_bytes(vec, block_size)
-				);
-
-				begin += block_size;
-			}
-
-			memmove(
-			    Vec_get_unchecked_ptr(vec, from_idx + removed),
-			    Vec_get_unchecked_ptr(vec, to_idx),
-			    // Vec_idx_to_bytes(vec, vec->size - (to_idx - removed))
-			    Vec_idx_to_bytes(vec, vec->size - to_idx)
-			);
-		} else {
-
-			printf("\n");
-			for (size_t i = 0; i < vec->size; i++) {
-				printf(
-				    "%c", *(char *)(vec->data + (i * vec->element_size))
-				);
-			}
-			printf("\n");
-
-			memmove(
-			    Vec_get_unchecked_ptr(vec, from_idx),
-			    Vec_get_unchecked_ptr(vec, to_idx),
-			    Vec_idx_to_bytes(vec, vec->size - to_idx)
-			);
-
-			for (size_t i = 0; i < vec->size - removed; i++) {
-				printf(
-				    "%c", *(char *)(vec->data + (i * vec->element_size))
-				);
-			}
-			printf("\n");
-		}
-		Vec_free(omitted);
+		memmove(
+		    Vec_get_unchecked_ptr(vec, write),
+		    Vec_get_unchecked_ptr(vec, to_idx),
+		    Vec_idx_to_bytes(vec, vec->size - to_idx)
+		);
 
 		vec->size -= removed;
 
