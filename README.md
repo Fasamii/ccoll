@@ -8,15 +8,16 @@ or if you want .a files of specific collection use
 ```bash
 make [collection name]
 ```
-e.g.: if you want only libvec.a file (.a file with only vec implementation)
+so if you want only libvec.a file (.a file with only vec implementation) use:
 ```bash
 make vec 
 ```
 # How to use
 1. You have to #include .h file from ccoll/include/(collection name).h in your program. Each
 collection have its own .h file
-2. Then you have to build your project including in CC command .a file from ccoll/build/lib/ of used collections or if you
-want all just include ccoll/build/lib/libccoll.a file which contains all .a files, you can build it with 
+2. Then you have to build your project including in CC command .a files from ccoll/build/lib/lib(collection name).a of used collections or if you
+want all just include ccoll/build/lib/libccoll.a file which contains all .a files that you can build
+with that library
 ```bash
 make ccoll # build's main libccoll.a file
 ```
