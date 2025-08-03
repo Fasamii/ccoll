@@ -1,4 +1,6 @@
 // TODO:IMPORTANT: make overflow checks for void *data in these foo's
+// TODO:IMPORTANT: Check if you don't have memory leaks in foos with on remove
+// functionality especially ones with omitted Vec
 
 // TODO: rewrite below comment
 /*
@@ -365,8 +367,6 @@ int Vec_remove(Vec *vec, const size_t idx);
 // - CCOLL_DESTROYED
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx);
 
-// TODO: implement on_remove for that
-//
 // Removes all elements from the vec
 //
 // Returns:
@@ -441,6 +441,18 @@ Vec *Vec_slice_clone(const Vec *vec, size_t from_idx, size_t to_idx);
 //////////
 // UTIL //
 //////////
+
+// Checks if Vec is empty
+//
+// Returns:
+// - true if is empty
+// - false if isn't
+static inline bool Vec_is_empty(Vec *vec) {
+	if (vec->size == 0)
+		return true;
+	else
+		return false;
+}
 
 // Swaps two elements of the Vec
 //

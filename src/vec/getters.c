@@ -163,7 +163,38 @@ int Vec_remove_all(Vec *vec) {
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 
 	if (vec->size == 0) return CCOLL_SUCCESS;
-	vec->size = 0;
 
+	if (!vec->on_remove) {
+		vec->size = 0;
+		return CCOLL_SUCCESS;
+	}
+
+	size_t original_size = vec->size;
+	size_t keep_pos = 0; // Position to write elements that should be kept
+
+	// Process elements in-place, keeping only canceled removals
+	for (size_t i = 0; i < original_size; i++) {
+		void *element_ptr = Vec_get_unchecked_ptr(vec, i);
+
+		switch (vec->on_remove(
+		    element_ptr, i, vec->element_size, CCOLL_OPERATION_REMOVE
+		)) {
+		case CCOLL_CALLBACK_NOTHING: break;
+		case CCOLL_CALLBACK_CANCEL:
+			if (keep_pos != i) {
+				memmove(
+				    (char *)vec->data + (keep_pos * vec->element_size),
+				    element_ptr, vec->element_size
+				);
+			}
+			keep_pos++;
+			break;
+		case CCOLL_CALLBACK_DESTROY_VEC:
+			Vec_free(vec);
+			return CCOLL_DESTROYED;
+		}
+	}
+
+	vec->size = keep_pos;
 	return CCOLL_SUCCESS;
 }
