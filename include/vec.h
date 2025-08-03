@@ -2,36 +2,49 @@
 // TODO:IMPORTANT: Check if you don't have memory leaks in foos with on remove
 // functionality especially ones with omitted Vec
 
-// TODO: rewrite below comment
 /*
- * Vec (Vector)
+ * Vec — A dynamically resizable vector-like collection.
  *
- * Mind set:
- *	once some data is passed to vec it takes ownership of that data so using
- *old pointer to it as it int in vec structure is bad idea if you want to clone
- *	most foo's implement clone variant of itself
+ * Overview:
+ * The `Vec` structure allows you to store elements of any type in a contiguous, dynamically
+ * managed memory block.
  *
- *	Vec automatically allocates memory but doesn't free it on its own
- *	but using Vec_init_with(), Vec_alloc() or Vec_reserve() is good idea if
- *	you care about performance
+ * Initialization:
+ * You must initialize a `Vec` using one of the following functions:
  *
- * Usage:
- *	#include "collections/vec.h" // To include vector
- *	Vec *vec = Vec_init(sizeof(<Type of data structure you want to story>))
+ * - `Vec_init(size_t elem_size)`  
+ *     Allocates a new `Vec` to store elements of the specified size in bytes.
+ *
+ * - `Vec_init_with(size_t elem_size, size_t capacity)`  
+ *     Allocates a new `Vec` with an initial capacity (number of elements) you specify.
+ *
+ * Cleanup:
+ * After you are done using a `Vec`, you **must** free its memory using:
+ *
+ *     Vec_free(Vec *vec);
  *
  * Example:
- *	#include "ccoll/vec.h"
  *
- *	// to create vector of struct storing two integers
- *	typedef struct Type {
- *		int a;
- *		int b;
- *	} Type;
- *	Vec *vec = Vec_init(sizeof(Type));
+ *     Vec *vec = Vec_init_with(sizeof(char), 4); // Allocates space for 4 chars
  *
- *	// to put data inside vec
- *	Type *t = (Type*)malloc(sizeof(Type));
- *	Vec_push(vec, t);
+ *     char *str = "abc"; // Null-terminated string
+ *
+ *     Vec_push_range(vec, str, 3); // Pushes 'a', 'b', 'c' — omits '\0' explicitly
+ *
+ *     Vec_shrink(vec); // Shrinks memory to exactly fit the current element count. (4 -> 3)
+ *
+ *     for (size_t i = 0; i < vec->size; i++) {
+ *         fprintf(stdout, "%c\n", *(char *)Vec_get(vec, i));
+ *     }
+ *
+ *     Vec_free(vec); // Frees memory, avoiding leaks
+ *
+ * Notes:
+ * - You must cast the return value of `Vec_get()` to the correct type:
+ *       *(<element_type> *)Vec_get(vec, index)
+ *
+ * - `Vec` has more advanced features. Refer to the documentation for each function
+ *   for additional capabilities.
  */
 
 #ifndef CCOLL_VEC_H

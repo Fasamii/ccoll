@@ -18,12 +18,13 @@ collection have its own .h file
 2. Then you have to build your project including in CC command .a files from ccoll/build/lib/lib(collection name).a of used collections or if you
 want all just include ccoll/build/lib/libccoll.a file which contains all .a files that you can build
 with that library
+building libccoll.a file:
 ```bash
 make ccoll # build's main libccoll.a file
 ```
 or
 ```bash
-make all # build's all .a files
+make all # build's all .a files including libccoll.a
 ```
 # overall TODO's
 - [ ] consider making free foos not free and remove elements but only free you would have to remove
