@@ -4,11 +4,11 @@ right now Vec (vector) is being implemented
 ```bash
 make
 ```
-or if you want .a files of specific collection (like Vec) use
+or if you want .a files of specific collection use
 ```bash
 make [collection name]
 ```
-e.g.:
+e.g.: if you want only libvec.a file (.a file with only vec implementation)
 ```bash
 make vec 
 ```
