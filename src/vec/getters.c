@@ -96,6 +96,8 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (to_idx > vec->size) return CCOLL_INVALID_RANGE;
 	if (to_idx >= from_idx) return CCOLL_INVALID_ELEMENT;
 
+	if (from_idx == to_idx) return CCOLL_SUCCESS;
+
 	size_t range = (to_idx - from_idx);
 
 	if (vec->on_remove) {
@@ -112,6 +114,7 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 				Vec_push(omitted, &i);
 				break;
 			case CCOLL_CALLBACK_DESTROY_VEC:
+				Vec_free(omitted);
 				Vec_free(vec);
 				return CCOLL_DESTROYED;
 			default: break;
@@ -125,9 +128,11 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 			memmove(
 			    Vec_get_unchecked_ptr(vec, idx),
 			    Vec_get_unchecked_ptr(vec, idx + 1),
-			    Vec_idx_to_bytes(vec, vec->size - idx)
+			    Vec_idx_to_bytes(vec, vec->size - (idx + 1))
 			);
 		}
+
+		Vec_free(omitted);
 
 		vec->size -= removed;
 

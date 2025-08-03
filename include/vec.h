@@ -1,7 +1,3 @@
-// TODO:IMPORTANT: make overflow checks for void *data in these foo's
-// TODO:IMPORTANT: Check if you don't have memory leaks in foos with on remove
-// functionality especially ones with omitted Vec
-
 /*
  * Vec — A dynamically resizable vector-like collection.
  *
@@ -37,7 +33,7 @@
  * count. (4 -> 3)
  *
  *     for (size_t i = 0; i < vec->size; i++) {
- *         fprintf(stdout, "%c\n", *(char *)Vec_get(vec, i));
+ *         fprintf(stdout, "%c\n", *(char *)Vec_get_ptr(vec, i));
  *     }
  *
  *     Vec_free(vec); // Frees memory, avoiding leaks

@@ -36,7 +36,6 @@ make all # build's all .a files including libccoll.a
 - [ ] make get foo's have variants like get last and first
 - [ ] rewrite the .h files to group similar foo's and make better explanations
 - [ ] make some error logging functionality that can be disabled in build time
-- [ ] fix on_remove foo functionality and make vec call it on every element removal
 - [ ] remove unnecessary checks on the top of each foo
 - [ ] consider making every foo that return's pointer return result code and take ** parameter
 - [ ] consider making some sort of macro for checks on the beginning of each foo
