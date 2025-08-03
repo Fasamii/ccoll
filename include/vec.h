@@ -100,7 +100,9 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // MEMORY //
 ////////////
 
-// sets on_remove callback for the vec
+// sets on_remove callback for the vec. (you can write to data (first arg)
+// size_t element_size (third arg) bytes as it is a pointer to element directly
+// in vec)
 //
 // codes:
 // 1. CCOLL_CALLBACK_NOTHING - do nothing
@@ -114,7 +116,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 int Vec_set_on_remove_callback(
     Vec *vec,
     int (*fn)(
-	  void *, size_t idx, size_t element_size, CCOLL_OPERATION operation
+	  void *data, size_t idx, size_t element_size, CCOLL_OPERATION operation
     )
 );
 
@@ -484,7 +486,7 @@ int Vec_swap(Vec *vec, size_t idx1, size_t idx2);
 // - CCOLL_NULL
 // - CCOLL_NULL_INTERNAL_DATA
 // - CCOLL_NULL_DATA
-int Vec_fill(Vec *vec, const void *data);
+int Vec_fill(Vec *vec, void *data);
 
 ////////////////
 // FUNCTIONAL //

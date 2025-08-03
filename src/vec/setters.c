@@ -287,7 +287,7 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	return vec;
 }
 
-int Vec_fill(Vec *vec, const void *data) {
+int Vec_fill(Vec *vec, void *data) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
@@ -297,6 +297,11 @@ int Vec_fill(Vec *vec, const void *data) {
 			vec->on_remove(
 			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REPLACE_FORCED
+			);
+		}
+		for (size_t i = vec->size; i < vec->capacity; i++) {
+			vec->on_remove(
+			    data, i, vec->element_size, CCOLL_OPERATION_CREATE
 			);
 		}
 	}

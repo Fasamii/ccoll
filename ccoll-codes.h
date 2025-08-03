@@ -29,12 +29,13 @@
 #ifndef CCOLL_OPERATION_CODES_H
 #define CCOLL_OPERATION_CODES_H
 
+// TODO: remove later manual assigning
 typedef enum CCOLL_OPERATION {
-	CCOLL_OPERATION_CREATE,		   // creating new element
-	CCOLL_OPERATION_REPLACE,	   // replacing element
-	CCOLL_OPERATION_REPLACE_FORCED, // replacing (unstoppable)
-	CCOLL_OPERATION_REMOVE,		   // removing element
-	CCOLL_OPERATION_REMOVE_FORCED,   //  removing (unstoppable)
+	CCOLL_OPERATION_CREATE=0,		  // creating new element
+	CCOLL_OPERATION_REPLACE=1,	  // replacing element
+	CCOLL_OPERATION_REPLACE_FORCED=2, // replacing (unstoppable)
+	CCOLL_OPERATION_REMOVE=3,		  // removing element
+	CCOLL_OPERATION_REMOVE_FORCED=4,  //  removing (unstoppable)
 } CCOLL_OPERATION;
 
 #endif

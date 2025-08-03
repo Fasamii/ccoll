@@ -6,6 +6,9 @@
 #include "../../ccoll-codes.h"
 #include "../../include/vec.h"
 
+// TODO: remove later
+#include <stdio.h>
+
 void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx) {
 	void *data = malloc(vec->element_size);
 	if (!data) return NULL;
@@ -93,8 +96,8 @@ int Vec_remove(Vec *vec, const size_t idx) {
 int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
-	if (to_idx > vec->size) return CCOLL_INVALID_RANGE;
-	if (to_idx >= from_idx) return CCOLL_INVALID_ELEMENT;
+	if (vec->size < to_idx) return CCOLL_INVALID_RANGE;
+	if (from_idx > to_idx) return CCOLL_INVALID_ELEMENT;
 
 	if (from_idx == to_idx) return CCOLL_SUCCESS;
 
@@ -121,30 +124,66 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 			}
 		}
 
+		printf("range	count ::: ::: ::: %ld\n", range);
+		printf("om size count ::: ::: ::: %ld\n", omitted->size);
 		size_t removed = range - omitted->size;
+		printf("removed count ::: ::: ::: %ld\n", removed);
 
-		while (omitted->size > 0) {
-			size_t idx = *(size_t *)Vec_pop_front(omitted);
+		if (!Vec_is_empty(omitted)) {
+			size_t begin = 0;
+			while (omitted->size > begin) {
+				size_t idx =
+				    *(size_t *)Vec_get_unchecked_ptr(omitted, begin);
+				size_t block_size = 1;
+				while (begin + block_size < omitted->size &&
+					 *(size_t *)Vec_get_ptr(
+					     omitted, begin + block_size
+					 ) == idx + block_size) {
+					Vec_remove(omitted, 0);
+					block_size++;
+				};
+
+				memmove(
+				    Vec_get_unchecked_ptr(vec, from_idx + begin),
+				    Vec_get_unchecked_ptr(vec, idx),
+				    Vec_idx_to_bytes(vec, block_size)
+				);
+
+				begin += block_size;
+			}
+
 			memmove(
-			    Vec_get_unchecked_ptr(vec, idx),
-			    Vec_get_unchecked_ptr(vec, idx + 1),
-			    Vec_idx_to_bytes(vec, vec->size - (idx + 1))
+			    Vec_get_unchecked_ptr(vec, from_idx + removed),
+			    Vec_get_unchecked_ptr(vec, to_idx),
+			    // Vec_idx_to_bytes(vec, vec->size - (to_idx - removed))
+			    Vec_idx_to_bytes(vec, vec->size - to_idx)
 			);
-		}
+		} else {
 
+			printf("\n");
+			for (size_t i = 0; i < vec->size; i++) {
+				printf(
+				    "%c", *(char *)(vec->data + (i * vec->element_size))
+				);
+			}
+			printf("\n");
+
+			memmove(
+			    Vec_get_unchecked_ptr(vec, from_idx),
+			    Vec_get_unchecked_ptr(vec, to_idx),
+			    Vec_idx_to_bytes(vec, vec->size - to_idx)
+			);
+
+			for (size_t i = 0; i < vec->size - removed; i++) {
+				printf(
+				    "%c", *(char *)(vec->data + (i * vec->element_size))
+				);
+			}
+			printf("\n");
+		}
 		Vec_free(omitted);
 
 		vec->size -= removed;
-
-		void *tmp_data = realloc(
-		    vec->data, Vec_idx_to_bytes(vec, vec->capacity - removed)
-		);
-		if (!tmp_data)
-			return canceled
-				     ? CCOLL_SUCCESS_WITH_NO_REMOVED_MEMORY
-				     : CCOLL_SUCCESS_WITH_NO_REMOVED_MEMORY_WITH_CANCELED;
-		vec->capacity -= removed;
-		vec->data = tmp_data;
 
 		return canceled ? CCOLL_SUCCESS_WITH_CANCELED : CCOLL_SUCCESS;
 	} else {

@@ -9,6 +9,7 @@
 #include "../util.h"
 
 #include "free-range.c"
+#include "remove-range.c"
 
 // Covers: Vec_init(), Vec_init_with(), Vec_free()
 void TEST_inti_and_free(size_t sizeof_data) {
@@ -566,7 +567,9 @@ int main(void) {
 	TEST_vec_set_range(990090);
 	section("Callback foo");
 	TEST_after_fn();
-
+	section("Remove range with callback");
+	TEST_remove_range();
+	TEST_remove_range_char();
 	printf("\n");
 	return 0;
 }
