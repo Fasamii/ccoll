@@ -4,7 +4,7 @@ right now Vec (vector) is being implemented
 ```bash
 make
 ```
-or if you want .a files of specific collection use
+or if you want .a files of specific collection (like Vec) use
 ```bash
 make [collection name]
 ```
