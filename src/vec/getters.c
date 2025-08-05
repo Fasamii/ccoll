@@ -68,8 +68,8 @@ int Vec_remove(Vec *vec, const size_t idx) {
 	if (vec->size == 0) return CCOLL_EMPTY;
 	if (idx >= vec->size) return CCOLL_INVALID_ELEMENT;
 
-	if (vec->on_remove) {
-		switch (vec->on_remove(
+	if (vec->on_change) {
+		switch (vec->on_change(
 		    Vec_get_unchecked_ptr(vec, idx), idx, vec->element_size,
 		    CCOLL_OPERATION_REMOVE
 		)) {
@@ -102,13 +102,13 @@ int Vec_remove_range(Vec *vec, const size_t from_idx, const size_t to_idx) {
 
 	size_t range = (to_idx - from_idx);
 
-	if (vec->on_remove) {
+	if (vec->on_change) {
 		bool canceled = false;
 		size_t write  = from_idx;
 
 		for (size_t read = from_idx; read < to_idx; read++) {
 			void *element = Vec_get_unchecked_ptr(vec, read);
-			switch (vec->on_remove(
+			switch (vec->on_change(
 			    element, read, vec->element_size, CCOLL_OPERATION_REMOVE
 			)) {
 			case CCOLL_CALLBACK_NOTHING: break;
@@ -160,7 +160,7 @@ int Vec_remove_all(Vec *vec) {
 
 	if (vec->size == 0) return CCOLL_SUCCESS;
 
-	if (!vec->on_remove) {
+	if (!vec->on_change) {
 		vec->size = 0;
 		return CCOLL_SUCCESS;
 	}
@@ -172,7 +172,7 @@ int Vec_remove_all(Vec *vec) {
 	for (size_t i = 0; i < original_size; i++) {
 		void *element_ptr = Vec_get_unchecked_ptr(vec, i);
 
-		switch (vec->on_remove(
+		switch (vec->on_change(
 		    element_ptr, i, vec->element_size, CCOLL_OPERATION_REMOVE
 		)) {
 		case CCOLL_CALLBACK_NOTHING: break;

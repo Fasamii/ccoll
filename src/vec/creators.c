@@ -14,7 +14,7 @@ Vec *Vec_init(const size_t size_of_data) {
 	vec->size		= 0;
 	vec->element_size = size_of_data;
 	vec->capacity	= CCOLL_VEC_MIN_CAPACITY;
-	vec->on_remove	= NULL;
+	vec->on_change= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -35,7 +35,7 @@ Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 	vec->size		= 0;
 	vec->element_size = size_of_data;
 	vec->capacity	= min_capacity;
-	vec->on_remove	= NULL;
+	vec->on_change= NULL;
 
 	vec->data = (void *)malloc(vec->capacity * vec->element_size);
 	if (!vec->data) {
@@ -46,7 +46,7 @@ Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
 	return vec;
 }
 
-int Vec_set_on_remove_callback(
+int Vec_set_on_change_callback(
     Vec *vec,
     int (*fn)(
 	  void *, size_t idx, size_t element_size, CCOLL_OPERATION operation
@@ -54,6 +54,6 @@ int Vec_set_on_remove_callback(
 ) {
 	if (!vec) return CCOLL_NULL;
 	if (!fn) return CCOLL_NULL_FN;
-	vec->on_remove = fn;
+	vec->on_change= fn;
 	return CCOLL_SUCCESS;
 }

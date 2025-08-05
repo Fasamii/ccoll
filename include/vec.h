@@ -61,7 +61,7 @@ typedef struct Vec {
 	size_t size;
 	size_t capacity;
 	size_t element_size;
-	int (*on_remove)(
+	int (*on_change)(
 	    void *data, size_t idx, size_t element_size, CCOLL_OPERATION operation
 	);
 	void *data;
@@ -100,7 +100,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // MEMORY //
 ////////////
 
-// sets on_remove callback for the vec. (you can write to data (first arg)
+// sets on_change callback for the vec. (you can write to data (first arg)
 // size_t element_size (third arg) bytes as it is a pointer to element directly
 // in vec)
 //
@@ -113,7 +113,7 @@ Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 // - CCOLL_SUCCESS
 // - CCOLL_NULL
 // - CCOLL_NULL_FN
-int Vec_set_on_remove_callback(
+int Vec_set_on_change_callback(
     Vec *vec,
     int (*fn)(
 	  void *data, size_t idx, size_t element_size, CCOLL_OPERATION operation

@@ -24,7 +24,7 @@ int CALLBACK_remove_reange(
 
 int TEST_remove_range() {
 	Vec *vec = Vec_init_with(sizeof(double), 12);
-	Vec_set_on_remove_callback(vec, CALLBACK_remove_reange);
+	Vec_set_on_change_callback(vec, CALLBACK_remove_reange);
 	double data = 12.12312312;
 	double datb = 13.54638432;
 
@@ -76,7 +76,7 @@ int CALLBACK_remove_reange_char(
 int TEST_remove_range_char() {
 	log("sc start\n");
 	Vec *vec  = Vec_init_with(sizeof(char), 10);
-	char *str = "0123456789"; 
+	char *str = "0123456789";
 	// generate_random_string(str, 12);
 	Vec_set_range(vec, str, 0, 10);
 	for (size_t i = 0; i < vec->size; i++) {
@@ -84,7 +84,7 @@ int TEST_remove_range_char() {
 	}
 
 	cond = true;
-	Vec_set_on_remove_callback(vec, CALLBACK_remove_reange_char);
+	Vec_set_on_change_callback(vec, CALLBACK_remove_reange_char);
 
 	Vec_remove_range(vec, 1, 2);
 	Vec_remove_range(vec, 3, 5);

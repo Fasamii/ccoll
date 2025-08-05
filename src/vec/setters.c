@@ -1,3 +1,5 @@
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,8 +22,8 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 		vec->size++;
 		return CCOLL_SUCCESS;
 	} else {
-		if (vec->on_remove) {
-			switch (vec->on_remove(
+		if (vec->on_change) {
+			switch (vec->on_change(
 			    Vec_get_unchecked_ptr(vec, idx), idx, vec->element_size,
 			    CCOLL_OPERATION_REPLACE
 			)) {
@@ -41,8 +43,7 @@ int Vec_set(Vec *vec, const size_t idx, const void *data) {
 	return CCOLL_SUCCESS;
 }
 
-// IMPORTANT: completely refactor that foo it works (actually it does not work
-// lol) but it is so messy I don't even want to look at it
+// TODO:TEST: that foo
 int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 ) {
@@ -50,57 +51,50 @@ int Vec_set_range(
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 	if (start_idx > vec->size) return CCOLL_INVALID_ELEMENT;
-	if (SIZE_MAX - vec->size < quantity) return CCOLL_OVERFLOW;
+	if (quantity > SIZE_MAX - start_idx) return CCOLL_OVERFLOW;
 
 	if (quantity == 0) return CCOLL_SUCCESS;
-
 	size_t end_idx = start_idx + quantity;
 
 	if (end_idx > vec->capacity) {
 		if (Vec_reserve_entire(vec, end_idx)) return CCOLL_OUT_OF_MEMORY;
 	}
 
-	size_t omitted = 0;
-	bool canceled  = false;
-	if (vec->on_remove) {
-		for (size_t i = start_idx; i < start_idx + quantity; i++) {
-			switch (vec->on_remove(
-			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
-			    CCOLL_OPERATION_REPLACE
+	if (vec->on_change) {
+		size_t canceled = 0;
+		size_t write    = start_idx;
+		for (size_t current = start_idx; current < end_idx; current++) {
+			switch (vec->on_change(
+			    Vec_get_unchecked_ptr(vec, current), current,
+			    vec->element_size,
+			    current < vec->size ? CCOLL_OPERATION_REPLACE
+							: CCOLL_OPERATION_CREATE
 			)) {
-			case CCOLL_CALLBACK_CANCEL:
-				canceled = true;
-				if (i >= vec->size) omitted++;
-				start_idx--;
-				continue;
+			case CCOLL_CALLBACK_NOTHING:
+				memmove(
+				    Vec_get_unchecked_ptr(vec, write),
+				    data + Vec_idx_to_bytes(vec, current - start_idx),
+				    Vec_idx_to_bytes(vec, 1)
+				);
+				write++;
+				break;
+			case CCOLL_CALLBACK_CANCEL: canceled++; continue;
 			case CCOLL_CALLBACK_DESTROY_VEC:
 				Vec_free(vec);
 				return CCOLL_DESTROYED;
-			case CCOLL_CALLBACK_NOTHING:
-			default:
-				memcpy(
-				    Vec_get_unchecked_ptr(vec, i),
-				    data + ((i - start_idx) * vec->element_size),
-				    Vec_idx_to_bytes(vec, 1)
-				);
-				break;
 			}
 		}
-		if (end_idx > vec->size) {
-			vec->size = end_idx - omitted;
-		}
+
+		vec->size = end_idx > vec->size ? write : vec->size;
+		return canceled ? CCOLL_SUCCESS_WITH_CANCELED : CCOLL_SUCCESS;
 	} else {
-		memcpy(
+		memmove(
 		    Vec_get_unchecked_ptr(vec, start_idx), data,
 		    Vec_idx_to_bytes(vec, quantity)
 		);
-		if (end_idx >= vec->size) {
-			vec->size = end_idx;
-		}
+		vec->size = end_idx > vec->size ? end_idx : vec->size;
+		return CCOLL_SUCCESS;
 	}
-
-	if (canceled) return CCOLL_SUCCESS_WITH_CANCELED;
-	return CCOLL_SUCCESS;
 }
 
 int Vec_push(Vec *vec, const void *data) {
@@ -277,10 +271,10 @@ Vec *Vec_append_clone(const Vec *vec1, const Vec *vec2) {
 	    vec2->size * vec2->element_size
 	);
 
-	if (vec1->on_remove)
-		vec->on_remove = vec1->on_remove;
-	else if (vec2->on_remove)
-		vec->on_remove = vec2->on_remove;
+	if (vec1->on_change)
+		vec->on_change= vec1->on_change;
+	else if (vec2->on_change)
+		vec->on_change= vec2->on_change;
 
 	vec->size = vec1->size + vec2->size;
 
@@ -292,15 +286,15 @@ int Vec_fill(Vec *vec, void *data) {
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
 
-	if (vec->on_remove) {
+	if (vec->on_change) {
 		for (size_t i = 0; i < vec->size; i++) {
-			vec->on_remove(
+			vec->on_change(
 			    Vec_get_unchecked_ptr(vec, i), i, vec->element_size,
 			    CCOLL_OPERATION_REPLACE_FORCED
 			);
 		}
 		for (size_t i = vec->size; i < vec->capacity; i++) {
-			vec->on_remove(
+			vec->on_change(
 			    data, i, vec->element_size, CCOLL_OPERATION_CREATE
 			);
 		}

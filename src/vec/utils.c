@@ -21,7 +21,7 @@ int Vec_split(Vec *base, Vec **new_vec, const size_t idx) {
 	}
 
 	new->element_size = base->element_size;
-	if (base->on_remove) new->on_remove = base->on_remove;
+	if (base->on_change) new->on_change = base->on_change;
 
 	memcpy(
 	    new->data, base->data + (idx * base->element_size),
@@ -63,9 +63,9 @@ int Vec_split_clone(
 
 	new1->element_size = base->element_size;
 	new2->element_size = base->element_size;
-	if (base->on_remove) {
-		new1->on_remove = base->on_remove;
-		new2->on_remove = base->on_remove;
+	if (base->on_change) {
+		new1->on_change = base->on_change;
+		new2->on_change = base->on_change;
 	}
 
 	memcpy(new1->data, base->data, idx * base->element_size);
@@ -111,13 +111,13 @@ Vec *Vec_slice_clone(const Vec *vec, size_t from_idx, size_t to_idx) {
 	if (slice_size == 0) {
 		Vec *new = Vec_init(vec->element_size);
 		if (!new) return NULL;
-		if (vec->on_remove) new->on_remove = vec->on_remove;
+		if (vec->on_change) new->on_change = vec->on_change;
 		return new;
 	}
 
 	Vec *new = Vec_init_with(vec->element_size, slice_size);
 	if (!new) return NULL;
-	if (vec->on_remove) new->on_remove = vec->on_remove;
+	if (vec->on_change) new->on_change = vec->on_change;
 
 	memcpy(
 	    new->data, vec->data + (from_idx * vec->element_size),

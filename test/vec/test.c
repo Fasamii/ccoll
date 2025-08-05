@@ -229,7 +229,7 @@ void TEST_after_element(
 ) {
 	Vec *vec = Vec_init_with((size + 1) * sizeof(char), size);
 	if (vec == NULL) return;
-	Vec_set_on_remove_callback(vec, fn);
+	Vec_set_on_change_callback(vec, fn);
 
 	char *str = (char *)malloc((size + 1) * sizeof(char));
 	generate_random_string(str, size);
@@ -314,21 +314,24 @@ void TEST_vec_insert() {
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
 	    *(long *)Vec_get_ptr(vec, 0) == data1,
-	    "Validation check if data is correct (%ld)", *(long *)Vec_get_ptr(vec, 0)
+	    "Validation check if data is correct (%ld)",
+	    *(long *)Vec_get_ptr(vec, 0)
 	);
 
 	res = Vec_insert(vec, 0, &data2);
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
 	    *(long *)Vec_get_ptr(vec, 0) == data2,
-	    "Validation check if data is correct (%ld)", *(long *)Vec_get_ptr(vec, 0)
+	    "Validation check if data is correct (%ld)",
+	    *(long *)Vec_get_ptr(vec, 0)
 	);
 
 	res = Vec_insert(vec, 1, &data3);
 	assert_eq(res == CCOLL_SUCCESS, "Vec_insert() test");
 	assert_eq(
 	    *(long *)Vec_get_ptr(vec, 1) == data3,
-	    "Validation check if data is correct (%ld)", *(long *)Vec_get_ptr(vec, 1)
+	    "Validation check if data is correct (%ld)",
+	    *(long *)Vec_get_ptr(vec, 1)
 	);
 
 	Vec_shrink(vec);
@@ -337,7 +340,7 @@ void TEST_vec_insert() {
 	assert_eq(*(long *)Vec_get_ptr(vec, 1) == data3, "Data integrity check");
 	assert_eq(*(long *)Vec_get_ptr(vec, 2) == data1, "Data integrity check");
 
-	Vec_set_on_remove_callback(vec, CALLBACK_vec_insert);
+Vec_set_on_change_callback(vec, CALLBACK_vec_insert);
 	Vec_free(vec);
 }
 
@@ -467,10 +470,12 @@ void TEST_vec_set_range(size_t size) {
 	    vec->size == size + size, "size should be equal to %ld", size * 2
 	);
 	assert_eq(
-	    *(char *)Vec_get_ptr(vec, 0) == data[0], "Additional data validation 1"
+	    *(char *)Vec_get_ptr(vec, 0) == data[0],
+	    "Additional data validation 1"
 	);
 	assert_eq(
-	    *(char *)Vec_get_ptr(vec, size) == data[0], "Additional data validation 2"
+	    *(char *)Vec_get_ptr(vec, size) == data[0],
+	    "Additional data validation 2"
 	);
 
 	Vec_free(vec);
@@ -494,7 +499,7 @@ void TEST_after_fn() {
 	generate_random_string(data, 7); // 31 bc 32 is null terminating
 
 	Vec_push_range(vec, data, 7);
-	Vec_set_on_remove_callback(vec, CALLBACK_after_fn_test);
+	Vec_set_on_change_callback(vec, CALLBACK_after_fn_test);
 
 	clicked = 0;
 	Vec_set(vec, 0, &data[3]);
