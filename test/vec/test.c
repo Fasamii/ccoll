@@ -38,8 +38,8 @@ void TEST_push_pop(int count) {
 	char ch;
 	for (int i = 0; i < count; i++) {
 		ch = random_alphanumeric();
-		Vec_push(vec, &ch);
-		char res = *(char *)Vec_pop(vec);
+		Vec_push_back(vec, &ch);
+		char res = *(char *)Vec_pop_back(vec);
 		assert_eq(
 		    res == ch,
 		    "Vec_pop() Should return " BLU "%c" NOCOL " returned " BLU
@@ -69,7 +69,7 @@ void TEST_push_pop_edge() {
 	int res;
 	Vec *vec = Vec_init(sizeof(char));
 
-	res = Vec_push(vec, NULL);
+	res = Vec_push_back(vec, NULL);
 	printf("here I am\n");
 	assert_eq(
 	    res == CCOLL_NULL_DATA,
@@ -77,13 +77,13 @@ void TEST_push_pop_edge() {
 	);
 
 	char ch = 'a';
-	res	  = Vec_push(NULL, &ch);
+	res	  = Vec_push_back(NULL, &ch);
 	assert_eq(
 	    res == CCOLL_NULL,
 	    "Vec_push() should fail if invalid arguments are provided"
 	);
 
-	res = Vec_push(NULL, NULL);
+	res = Vec_push_back(NULL, NULL);
 	assert_eq(
 	    res == CCOLL_NULL,
 	    "Vec_push() should fail if invalid arguments are provided"
@@ -108,7 +108,7 @@ void TEST_push_pop_edge() {
 	    "Vec_push_front() should fail if invalid arguments are provided"
 	);
 
-	void *data = Vec_pop(vec);
+	void *data = Vec_pop_back(vec);
 	assert_eq(
 	    data == NULL,
 	    "Vec_pop() should fail if invalid arguments are provided"
@@ -130,7 +130,7 @@ void TEST_push_range(int size) {
 	char *str = (char *)malloc((size + 1) * sizeof(char));
 	generate_random_string(str, size);
 
-	Vec_push_range(vec, str, size);
+	Vec_push_back_range(vec, str, size);
 	assert_eq(
 	    memcmp(vec->data, str, size) == 0, "(vec:size:%ld):Vec_push_range()",
 	    vec->size
@@ -198,7 +198,7 @@ void TEST_fill(size_t size) {
 	double number = 10.10101012;
 	Vec_fill(vec, &number);
 
-	double last = *(double *)Vec_pop(vec);
+	double last = *(double *)Vec_pop_back(vec);
 	assert_eq(last == number, "Vec_pop() & Vec_fill() with size:%ld", size);
 
 	double *first = (double *)Vec_pop_front(vec);
@@ -498,7 +498,7 @@ void TEST_after_fn() {
 	char *data = (char *)malloc(8 * sizeof(char));
 	generate_random_string(data, 7); // 31 bc 32 is null terminating
 
-	Vec_push_range(vec, data, 7);
+	Vec_push_back_range(vec, data, 7);
 	Vec_set_on_change_callback(vec, CALLBACK_after_fn_test);
 
 	clicked = 0;

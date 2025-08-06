@@ -6,9 +6,6 @@
 #include "../../ccoll-codes.h"
 #include "../../include/vec.h"
 
-// TODO: remove later
-#include <stdio.h>
-
 void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx) {
 	void *data = malloc(vec->element_size);
 	if (!data) return NULL;
@@ -26,7 +23,7 @@ void *Vec_get_clone(const Vec *vec, const size_t idx) {
 	return Vec_get_clone_unchecked(vec, idx);
 }
 
-void *Vec_pop(Vec *vec) {
+void *Vec_pop_back(Vec *vec) {
 	if (!vec) return NULL;
 	if (!vec->data) return NULL;
 	if (vec->size < 1) return NULL;

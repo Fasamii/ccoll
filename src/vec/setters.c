@@ -97,7 +97,7 @@ int Vec_set_range(
 	}
 }
 
-int Vec_push(Vec *vec, const void *data) {
+int Vec_push_back(Vec *vec, const void *data) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;
@@ -135,7 +135,7 @@ int Vec_push_front(Vec *vec, const void *data) {
 	return CCOLL_SUCCESS;
 }
 
-int Vec_push_range(Vec *vec, const void *data, size_t quantity) {
+int Vec_push_back_range(Vec *vec, const void *data, size_t quantity) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if (!data) return CCOLL_NULL_DATA;

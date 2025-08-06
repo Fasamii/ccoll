@@ -70,7 +70,7 @@ int Vec_free(Vec *vec) {
 	return CCOLL_SUCCESS;
 }
 
-int Vec_free_ammount(Vec *vec, size_t idxs) {
+int Vec_free_amount(Vec *vec, size_t idxs) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
 	if ((vec->capacity - vec->size) < idxs)

@@ -51,6 +51,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 #include "../ccoll-codes.h"
@@ -96,6 +97,46 @@ Vec *Vec_init(size_t sizeof_data);
 // - NULL on failure
 Vec *Vec_init_with(size_t sizeof_data, size_t min_capacity);
 
+// Gets pointer to element at specified idx
+//
+// Returns:
+// - pointer to data
+// - undefined behavior
+static inline void *Vec_get_unchecked_ptr(const Vec *vec, const size_t idx) {
+	return (char *)vec->data + (idx * vec->element_size);
+}
+
+// Gets pointer to element at specified idx and rus checks if provided data is
+// valid
+//
+// Returns:
+// - pointer to data
+// - NULL on failure
+static inline void *Vec_get_ptr(const Vec *vec, const size_t idx) {
+	if (!vec) return NULL;
+	if (!vec->data) return NULL;
+	if (idx >= vec->size) return NULL;
+
+	return Vec_get_unchecked_ptr(vec, idx);
+}
+
+// Clones vec element from specified idx and returns pointer to it
+//
+// Returns:
+// - pointer to data
+// - undefined behavior
+//
+// !! You are responsible for freeing returned data !!
+void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx);
+
+// Clones vec element from specified idx and returns pointer to it
+//
+// Returns:
+// - Pointer to data
+// - NULL on failure
+//
+// !! You are responsible for freeing returned data !!
+void *Vec_get_clone(const Vec *vec, const size_t idx);
 ////////////
 // MEMORY //
 ////////////
@@ -175,6 +216,24 @@ int Vec_shrink_to(Vec *vec, const size_t size);
 // - CCOLL_NULL_INTERNAL_DATA
 int Vec_free(Vec *vec);
 
+// Safe wrapper around Vec_free() foo which also sets vec pointer to NULL
+//
+// Returns:
+// - CCOLL_SUCCESS
+// - CCOLL_NULL
+// - CCOLL_NULL_INTERNAL_DATA
+#define Vec_free_safe(vec)                                                     \
+	({                                                                       \
+		int _result = CCOLL_NULL;                                          \
+		if (vec) {                                                         \
+			_result = Vec_free(vec);                                     \
+			if (_result == CCOLL_SUCCESS) {                              \
+				(vec) = NULL;                                          \
+			}                                                            \
+		}                                                                  \
+		_result;                                                           \
+	})
+
 // Frees specified amount of idxs from Vec
 //
 // Returns:
@@ -183,7 +242,7 @@ int Vec_free(Vec *vec);
 // - CCOLL_NULL_INTERNAL_DATA
 // - CCOLL_NOT_ENOUGH_MEMORY_REQUESTED
 // - CCOLL_OUT_OF_MEMORY
-int Vec_free_ammount(Vec *vec, size_t idxs);
+int Vec_free_amount(Vec *vec, size_t idxs);
 
 ////////////////
 // VEC-IDX-IO //
@@ -219,47 +278,6 @@ int Vec_set_range(
     Vec *vec, const void *data, size_t start_idx, const size_t quantity
 );
 
-// Gets pointer to element at specified idx
-//
-// Returns:
-// - pointer to data
-// - undefined behavior
-static inline void *Vec_get_unchecked_ptr(const Vec *vec, const size_t idx) {
-	return (char *)vec->data + (idx * vec->element_size);
-}
-
-// Gets pointer to element at specified idx and rus checks if provided data is
-// valid
-//
-// Returns:
-// - pointer to data
-// - NULL on failure
-static inline void *Vec_get_ptr(const Vec *vec, const size_t idx) {
-	if (!vec) return NULL;
-	if (!vec->data) return NULL;
-	if (idx >= vec->size) return NULL;
-
-	return Vec_get_unchecked_ptr(vec, idx);
-}
-
-// Clones vec element from specified idx and returns pointer to it
-//
-// Returns:
-// - pointer to data
-// - undefined behavior
-//
-// !! You are responsible for freeing returned data !!
-void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx);
-
-// Clones vec element from specified idx and returns pointer to it
-//
-// Returns:
-// - Pointer to data
-// - NULL on failure
-//
-// !! You are responsible for freeing returned data !!
-void *Vec_get_clone(const Vec *vec, const size_t idx);
-
 ////////////////
 // VEC-POS-IO //
 ////////////////
@@ -273,7 +291,7 @@ void *Vec_get_clone(const Vec *vec, const size_t idx);
 // - CCOLL_NULL_DATA
 // - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-int Vec_push(Vec *vec, const void *data);
+int Vec_push_back(Vec *vec, const void *data);
 
 // Push data to the front
 //
@@ -295,7 +313,7 @@ int Vec_push_front(Vec *vec, const void *data);
 // - CCOLL_NULL_DATA
 // - CCOLL_OVERFLOW
 // - CCOLL_OUT_OF_MEMORY
-int Vec_push_range(Vec *vec, const void *data, size_t quantity);
+int Vec_push_back_range(Vec *vec, const void *data, size_t quantity);
 
 // Appends specified number of elements to Vec's front
 //
@@ -315,7 +333,7 @@ int Vec_push_front_range(Vec *vec, const void *data, size_t quantity);
 // - NULL on failure
 //
 // !! You are responsible for freeing returned data !!
-void *Vec_pop(Vec *vec);
+void *Vec_pop_back(Vec *vec);
 
 // Pop's data from the beginning and returns pointer to it
 //
