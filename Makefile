@@ -10,11 +10,11 @@ LIB_DIR     := $(BUILD_DIR)/lib
 CC          := gcc
 AR          := ar
 RANLIB      := ranlib
-CFLAGS      := -Wall -Wextra -std=c99 -O2 -I$(INCLUDE_DIR)
+CFLAGS      := -Wall -Wextra -std=c11 -O2 -I$(INCLUDE_DIR)
 ARFLAGS     := rcs
 
 # === Modules ===
-MODULES     := vec lli
+MODULES     := vec minivec lli
 
 # === Color definitions ===
 COLOR_CC    := \e[38;5;5m

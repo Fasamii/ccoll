@@ -3,3 +3,4 @@
 #define YEL "\e[38;5;3m"
 #define GRN "\e[38;5;2m"
 #define BLU "\e[38;5;4m"
+#define MAG "\e[38;5;5m"

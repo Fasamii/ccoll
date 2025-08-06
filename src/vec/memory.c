@@ -70,21 +70,6 @@ int Vec_free(Vec *vec) {
 	return CCOLL_SUCCESS;
 }
 
-int Vec_free_amount(Vec *vec, size_t idxs) {
-	if (!vec) return CCOLL_NULL;
-	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;
-	if ((vec->capacity - vec->size) < idxs)
-		return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
-
-	void *tmp_data =
-	    realloc(vec->data, Vec_idx_to_bytes(vec, vec->capacity - idxs));
-	if (!tmp_data) return CCOLL_OUT_OF_MEMORY;
-	vec->data = tmp_data;
-	vec->capacity -= idxs;
-
-	return CCOLL_SUCCESS;
-}
-
 int Vec_shrink(Vec *vec) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;

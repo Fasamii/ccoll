@@ -50,7 +50,6 @@
 #define CCOLL_VEC_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <sys/types.h>
 
@@ -76,7 +75,7 @@ typedef struct Vec {
 #define Vec_idx_to_bytes(vec, idxs) ((vec)->element_size * (idxs))
 
 // Calculates how much idxs will fit in specified amount of idxs
-#define Vec_bytes_to_idx(vec, idxs) ((idxs) / (vec)->element_size)
+#define Vec_bytes_to_idx(vec, bytes) ((bytes) / (vec)->element_size)
 
 //////////
 // INIT //
@@ -127,7 +126,7 @@ static inline void *Vec_get_ptr(const Vec *vec, const size_t idx) {
 // - undefined behavior
 //
 // !! You are responsible for freeing returned data !!
-void *Vec_get_clone_unchecked(const Vec *vec, const size_t idx);
+void *Vec_get_unchecked_clone(const Vec *vec, const size_t idx);
 
 // Clones vec element from specified idx and returns pointer to it
 //
@@ -233,16 +232,6 @@ int Vec_free(Vec *vec);
 		}                                                                  \
 		_result;                                                           \
 	})
-
-// Frees specified amount of idxs from Vec
-//
-// Returns:
-// - CCOLL_SUCCESS
-// - CCOLL_NULL
-// - CCOLL_NULL_INTERNAL_DATA
-// - CCOLL_NOT_ENOUGH_MEMORY_REQUESTED
-// - CCOLL_OUT_OF_MEMORY
-int Vec_free_amount(Vec *vec, size_t idxs);
 
 ////////////////
 // VEC-IDX-IO //
