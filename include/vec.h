@@ -1,3 +1,8 @@
+// TODO:  create stack treace
+// vec->debug_tag = "initialized";
+// vec->allocation_stack = collect_stack_trace(); // advanced but handy
+// (only in debug build)
+
 /*
  * Vec — A dynamically resizable vector-like collection.
  *
