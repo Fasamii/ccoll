@@ -3,8 +3,8 @@
 int main(void) {
 
 	MiniVec *vec = MiniVec_init(sizeof(char));
-	MiniVec_reserve_additional(vec, 12);
-	MiniVec_alloc(vec, 12);
+	MiniVec_reserve_additional(vec, 333);
+	MiniVec_alloc(vec, 7);
 
 	MiniVec_change_capacity(vec, 24);
 
