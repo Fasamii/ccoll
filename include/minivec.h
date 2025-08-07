@@ -6,13 +6,14 @@
 #define CCOLL_MINIVEC_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <sys/types.h>
 
 #include "../ccoll-codes.h"
 
-// cannot be set to 0
 #define CCOLL_MINIVEC_MIN_CAPACITY 8
+// #define CCOLL_MINIVEC_GROWTH_STRATEGY CCOLL_GROWTH_STRATEGY_GOLDEN
 #define CCOLL_MINIVEC_ARG_CHECK 1
 #define CCOLL_MINIVEC_DEBUG 1
 
@@ -44,10 +45,10 @@ int MiniVec_free(MiniVec *vec);
 		_result;                                                           \
 	})
 
-int MiniVec_reserve(MiniVec *vec, const size_t idxs);
-int MiniVec_alloc(MiniVec *vec, const size_t idxs);
-int MiniVec_shrink(MiniVec *vec);
 int MiniVec_change_capacity(MiniVec *vec, const size_t capacity);
+int MiniVec_alloc(MiniVec *vec, const size_t idxs);
+int MiniVec_reserve_additional(MiniVec *vec, const size_t idxs);
+int MiniVec_shrink(MiniVec *vec);
 
 int MiniVec_set(MiniVec *vec, const void *data, size_t idx);
 int MiniVec_set_range(
@@ -119,7 +120,7 @@ int MiniVec_fill(MiniVec *vec, void *data);
 
 #include "../colors.h"
 
-#define MINIVEC_LOG(msg, ...)                                                  \
+#define CCOLL_MINIVEC_LOG(msg, ...)                                                  \
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
@@ -132,7 +133,7 @@ int MiniVec_fill(MiniVec *vec, void *data);
 		    stdout, BLU "└[msg]: " NOCOL msg NOCOL "\n\n", ##__VA_ARGS__   \
 		);                                                                 \
 	} while (0)
-#define MINIVEC_WARN(msg, ...)                                                 \
+#define CCOLL_MINIVEC_WARN(msg, ...)                                                 \
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
@@ -145,7 +146,7 @@ int MiniVec_fill(MiniVec *vec, void *data);
 		    stdout, YEL "└[msg]: " NOCOL msg NOCOL "\n\n", ##__VA_ARGS__   \
 		);                                                                 \
 	} while (0)
-#define MINIVEC_ERROR(msg, ...)                                                \
+#define CCOLL_MINIVEC_ERROR(msg, ...)                                                \
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
@@ -159,7 +160,7 @@ int MiniVec_fill(MiniVec *vec, void *data);
 		    stdout, RED "└[msg]: " NOCOL msg NOCOL "\n\n", ##__VA_ARGS__   \
 		);                                                                 \
 	} while (0)
-#define MINIVEC_ASSERT(CONDITION, msg, ...)                                    \
+#define CCOLL_MINIVEC_ASSERT(CONDITION, msg, ...)                                    \
 	do {                                                                     \
 		if (!(CONDITION)) {                                                \
 			fprintf(                                                     \
@@ -212,21 +213,21 @@ int MiniVec_fill(MiniVec *vec, void *data);
 #if CCOLL_MINIVEC_ARG_CHECK
 #define CCOLL_MINIVEC_INTEGRITY_CHECK(ptr)                                     \
 	if (!(ptr)) {                                                            \
-		MINIVEC_ERROR("passed MiniVec is NULl");                           \
+		CCOLL_MINIVEC_ERROR("passed MiniVec is NULl");                           \
 		return CCOLL_NULL;                                                 \
 	};                                                                       \
 	if (!(ptr)->data) {                                                      \
-		MINIVEC_ERROR("data of passed MiniVec is NULL");                   \
+		CCOLL_MINIVEC_ERROR("data of passed MiniVec is NULL");                   \
 		return CCOLL_NULL_INTERNAL_DATA;                                   \
 	}
 
 #define CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element)                  \
 	if ((sizeof_element == 0)) {                                             \
-		MINIVEC_ERROR("element size 0 is not allowed");                    \
+		CCOLL_MINIVEC_ERROR("element size 0 is not allowed");                    \
 		return NULL;                                                       \
 	}                                                                        \
-	if (!(sizeof_element <= alignof(max_align_t))) {                           \
-		MINIVEC_ERROR(                                                     \
+	if (!(sizeof_element <= alignof(max_align_t))) {                         \
+		CCOLL_MINIVEC_ERROR(                                                     \
 		    "Check if realloc and malloc will handle alligment correctly"  \
 		);                                                                 \
 		return NULL;                                                       \

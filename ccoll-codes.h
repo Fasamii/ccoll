@@ -31,11 +31,11 @@
 
 // TODO: remove later manual assigning
 typedef enum CCOLL_OPERATION {
-	CCOLL_OPERATION_CREATE=0,		  // creating new element
-	CCOLL_OPERATION_REPLACE=1,	  // replacing element
-	CCOLL_OPERATION_REPLACE_FORCED=2, // replacing (unstoppable)
-	CCOLL_OPERATION_REMOVE=3,		  // removing element
-	CCOLL_OPERATION_REMOVE_FORCED=4,  //  removing (unstoppable)
+	CCOLL_OPERATION_CREATE		 = 0, // creating new element
+	CCOLL_OPERATION_REPLACE		 = 1, // replacing element
+	CCOLL_OPERATION_REPLACE_FORCED = 2, // replacing (unstoppable)
+	CCOLL_OPERATION_REMOVE		 = 3, // removing element
+	CCOLL_OPERATION_REMOVE_FORCED	 = 4, //  removing (unstoppable)
 } CCOLL_OPERATION;
 
 #endif
@@ -50,5 +50,11 @@ typedef enum CCOLL_CALLBACK {
 	CCOLL_CALLBACK_REMOVE,
 	CCOLL_CALLBACK_SKIP_NEXT,
 } CCOLL_CALLBACK;
+
+typedef enum CCOLL_GROWTH_STRATEGY {
+	CCOLL_GROWTH_STRATEGY_GOLDEN,
+	CCOLL_GROWTH_STRATEGY_DOUBLE,
+	CCOLL_GROWTH_STRATEGY_EXACTLY,
+} CCOLL_GROWTH_STRATEGY;
 
 #endif
