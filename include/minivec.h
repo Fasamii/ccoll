@@ -190,9 +190,7 @@ int MiniVec_fill(MiniVec *vec, void *data);
 			);                                                           \
 		}                                                                  \
 	} while (0)
-
 #else
-
 #define CCOLL_MINIVEC_LOG(msg, ...)                                            \
 	do {                                                                     \
 	} while (0)
@@ -224,13 +222,13 @@ int MiniVec_fill(MiniVec *vec, void *data);
 #define CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element)                  \
 	if ((sizeof_element == 0)) {                                             \
 		CCOLL_MINIVEC_ERROR("element size 0 is not allowed");              \
-		return NULL;                                                       \
+		return CCOLL_INVALID_ARGUMENT;                                     \
 	}                                                                        \
 	if (!(sizeof_element <= alignof(max_align_t))) {                         \
 		CCOLL_MINIVEC_ERROR(                                               \
 		    "Check if realloc and malloc will handle alligment correctly"  \
 		);                                                                 \
-		return NULL;                                                       \
+		return CCOLL_INVALID_ARGUMENT;                                     \
 	}
 #define CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(a, b)                                 \
 	if (SIZE_MAX - a < b) {                                                  \
@@ -238,11 +236,9 @@ int MiniVec_fill(MiniVec *vec, void *data);
 		return CCOLL_OVERFLOW;                                             \
 	}
 #else
-
 #define CCOLL_MINIVEC_INTEGRITY_CHECK(ptr)
 #define CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element)
 #define CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(a, b)
-
 #endif
 
 #endif

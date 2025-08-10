@@ -92,5 +92,6 @@ int TEST_remove_range_char() {
 		log("Vec::[%ld]::(%c)", i, *(char *)Vec_get_unchecked_ptr(vec, i));
 	}
 
+	Vec_free(vec);
 	return 0;
 }

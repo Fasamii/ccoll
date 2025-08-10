@@ -6,66 +6,71 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-MiniVec *MiniVec_init(size_t sizeof_element) {
+int _MiniVec_malloc(
+    MiniVec **to_alloc, size_t sizeof_element, size_t capacity
+) {
 	CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element);
 
-	if (MiniVec_mul_will_overflow(
-		  CCOLL_MINIVEC_MIN_CAPACITY, sizeof_element
-	    )) {
-		CCOLL_MINIVEC_ERROR("bytes multiplication overflow");
-		return NULL;
+	if (capacity == 0) {
+		CCOLL_MINIVEC_ERROR("Passed capacity of size 0");
+		return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
 	}
 
-	MiniVec *vec = (MiniVec *)calloc(1, sizeof(MiniVec));
+	if (MiniVec_mul_will_overflow(capacity, sizeof_element)) {
+		CCOLL_MINIVEC_ERROR("bytes multiplication overflow");
+		return CCOLL_OVERFLOW;
+	}
+
+	MiniVec *vec = (MiniVec *)malloc(sizeof(MiniVec));
 	if (!vec) {
-		CCOLL_MINIVEC_ERROR("malloc for MiniVec failed");
-		return NULL;
+		CCOLL_MINIVEC_ERROR("malloc for MiniVec returned NULL");
+		return CCOLL_OUT_OF_MEMORY;
 	}
 
 	vec->size		= 0;
 	vec->element_size = sizeof_element;
-	vec->capacity	= CCOLL_MINIVEC_MIN_CAPACITY;
+	vec->capacity	= capacity;
 
-	vec->data = (void *)malloc(MiniVec_count_to_bytes(vec, vec->capacity));
+	vec->data = (void *)malloc(MiniVec_count_to_bytes(vec, capacity));
 	if (!vec->data) {
-		CCOLL_MINIVEC_ERROR("malloc for MiniVec -> data failed");
+		CCOLL_MINIVEC_ERROR("malloc for MiniVec data returned NULL");
 		free(vec);
-		return NULL;
+		return CCOLL_OUT_OF_MEMORY;
 	}
 
-	CCOLL_MINIVEC_LOG("operation successful");
-	return vec;
+	*to_alloc = vec;
+
+	return CCOLL_SUCCESS;
 }
 
-MiniVec *MiniVec_init_with(size_t sizeof_element, size_t min_capacity) {
-	CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element);
-	if (min_capacity == 0) {
-		CCOLL_MINIVEC_ERROR("Passed capacity of size 0");
+MiniVec *MiniVec_init(size_t sizeof_element) {
+
+	int ret	 = 0;
+	MiniVec *vec = NULL;
+
+	ret = _MiniVec_malloc(&vec, sizeof_element, CCOLL_MINIVEC_MIN_CAPACITY);
+
+	if (ret != CCOLL_SUCCESS) {
+		CCOLL_MINIVEC_LOG("MiniVec init failed");
 		return NULL;
+	} else {
+		CCOLL_MINIVEC_LOG("operation successful");
+		return vec;
 	}
+}
 
-	if (MiniVec_mul_will_overflow(min_capacity, sizeof_element)) {
-		CCOLL_MINIVEC_ERROR("bytes multiplication overflow");
+MiniVec *MiniVec_init_with(size_t sizeof_element, size_t capacity) {
+
+	int ret	 = 0;
+	MiniVec *vec = NULL;
+
+	ret = _MiniVec_malloc(&vec, sizeof_element, capacity);
+
+	if (ret != CCOLL_SUCCESS) {
+		CCOLL_MINIVEC_LOG("MiniVec init with capacity failed");
 		return NULL;
+	} else {
+		CCOLL_MINIVEC_LOG("operation successful");
+		return vec;
 	}
-
-	MiniVec *vec = (MiniVec *)calloc(1, sizeof(MiniVec));
-	if (!vec) {
-		CCOLL_MINIVEC_ERROR("malloc for MiniVec failed");
-		return NULL;
-	}
-
-	vec->size		= 0;
-	vec->element_size = sizeof_element;
-	vec->capacity	= min_capacity;
-
-	vec->data = (void *)malloc(MiniVec_count_to_bytes(vec, vec->capacity));
-	if (!vec->data) {
-		CCOLL_MINIVEC_ERROR("malloc for MiniVec -> data failed");
-		free(vec);
-		return NULL;
-	}
-
-	CCOLL_MINIVEC_LOG("operation successful");
-	return vec;
 }

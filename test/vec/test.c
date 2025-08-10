@@ -190,6 +190,8 @@ void TEST_edge_init_and_free() {
 	assert_eq(
 	    res == CCOLL_NULL, "Vec_free() should return CCOLL_INVALID_ARGUMENT"
 	);
+
+	Vec_free(vec);
 }
 
 // Covers: Vec_fill(), Vec_pop(), Vec_pop_front()
@@ -212,6 +214,8 @@ void TEST_fill(size_t size) {
 	assert_eq(
 	    *first == number, "Vec_pop_front() & Vec_fill() with size:%ld", size
 	);
+
+	Vec_free(vec);
 }
 
 int CALLBACK_after_element(
@@ -281,6 +285,8 @@ void TEST_vec_set() {
 	assert_eq(
 	    vec->size == 1, "just to check if it for sure din't set that data"
 	);
+
+	Vec_free(vec);
 }
 
 int CALLBACK_vec_insert(
@@ -340,7 +346,7 @@ void TEST_vec_insert() {
 	assert_eq(*(long *)Vec_get_ptr(vec, 1) == data3, "Data integrity check");
 	assert_eq(*(long *)Vec_get_ptr(vec, 2) == data1, "Data integrity check");
 
-Vec_set_on_change_callback(vec, CALLBACK_vec_insert);
+	Vec_set_on_change_callback(vec, CALLBACK_vec_insert);
 	Vec_free(vec);
 }
 
@@ -478,6 +484,7 @@ void TEST_vec_set_range(size_t size) {
 	    "Additional data validation 2"
 	);
 
+	free(data);
 	Vec_free(vec);
 
 	return;
@@ -521,6 +528,8 @@ void TEST_after_fn() {
 	    clicked == 4 + 7 + 7,
 	    "Callback function should increase click variable"
 	);
+
+	free(data);
 }
 
 int main(void) {

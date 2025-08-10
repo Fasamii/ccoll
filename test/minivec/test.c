@@ -13,7 +13,7 @@ int main(void) {
 
 	MiniVec_change_capacity(vec, 23);
 
-	MiniVec *vec2 = MiniVec_init(8931231923993402351);
+	MiniVec *vec2 = MiniVec_init_with(8931231923993402351, 12);
 
 	MiniVec_change_capacity(vec, 25);
 
@@ -33,6 +33,8 @@ int main(void) {
 	MiniVec_alloc(vec, 0);
 	MiniVec_reserve_additional(vec, 0);
 	MiniVec_change_capacity(vec, 0);
+
+	MiniVec_free_safe(vec);
 
 	return 0;
 }

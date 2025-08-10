@@ -25,4 +25,6 @@ void TEST_Vec_free_range() {
 	called = 0;
 
 	Vec_set_on_change_callback(vec, CALLBACK_Vec_free_range);
+
+	Vec_free(vec);
 }
