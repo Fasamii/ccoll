@@ -1,5 +1,5 @@
 /*
- * MiniVec - A minimalistic version of Vec
+ * MiniVec - A minimalist version of Vec
  */
 
 #ifndef CCOLL_MINIVEC_H
@@ -29,6 +29,15 @@ typedef struct MiniVec {
 struct _MiniVec_init_opts {
 	size_t capacity;
 	size_t alignment;
+};
+
+struct _MiniVec_change_capacity_opts {
+	size_t alignment;
+};
+
+struct _MiniVec_growth_capacity_opts {
+	size_t alignment;
+	CCOLL_GROWTH_STRATEGY growth_strategy;
 };
 
 #define MiniVec_count_to_bytes(vec, idxs) ((vec)->item_size * (idxs))
@@ -62,13 +71,48 @@ int _MiniVec_free(MiniVec *vec);
 	})
 
 // TODO: make docs
-int MiniVec_change_capacity(MiniVec *vec, const size_t capacity);
+int _MiniVec_change_capacity(
+    MiniVec *vec,
+    const size_t capacity,
+    const struct _MiniVec_change_capacity_opts *opts
+);
 // TODO: make docs
-int MiniVec_alloc(MiniVec *vec, const size_t idxs);
+#define MiniVec_change_capacity(vec, capacity, ...)                            \
+	_MiniVec_change_capacity(                                                \
+	    vec, capacity,                                                       \
+	    &(const struct _MiniVec_change_capacity_opts){__VA_ARGS__}           \
+	)
+
 // TODO: make docs
-int MiniVec_reserve_additional(MiniVec *vec, const size_t idxs);
+int _MiniVec_alloc(
+    MiniVec *vec,
+    const size_t idxs,
+    const struct _MiniVec_growth_capacity_opts *opts
+);
 // TODO: make docs
-int MiniVec_shrink(MiniVec *vec);
+#define MiniVec_alloc(vec, idxs, ...)                                          \
+	_MiniVec_alloc(                                                          \
+	    vec, idxs,                                                           \
+	    &(const struct _MiniVec_growth_capacity_opts){__VA_ARGS__}           \
+	)
+
+// TODO: make docs
+int _MiniVec_reserve_additional(
+    MiniVec *vec,
+    const size_t idxs,
+    const struct _MiniVec_growth_capacity_opts *opts
+);
+// TODO: make docs
+#define MiniVec_reserve_additional(vec, idxs, ...)                             \
+	_MiniVec_reserve_additional(                                             \
+	    vec, idxs,                                                           \
+	    &(const struct _MiniVec_growth_capacity_opts){__VA_ARGS__}           \
+	)
+
+// TODO: make docs
+int _MiniVec_shrink(MiniVec *vec, const struct _MiniVec_change_capacity_opts *opts);
+// TODO: make docs
+#define MiniVec_shrink()
 
 int MiniVec_set(MiniVec *vec, const void *data, size_t idx);
 int MiniVec_set_range(

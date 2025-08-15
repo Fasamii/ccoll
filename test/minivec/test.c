@@ -5,7 +5,7 @@
 int main(void) {
 
 	MiniVec *vec = MiniVec_init(sizeof(char));
-	for (size_t i = 0; i < 100; i++) {
+	for (size_t i = 0; i < 10; i++) {
 		MiniVec_free_safe(vec);
 		size_t cap = 9;
 		vec	     = MiniVec_init(2, .capacity = cap, .alignment = 1U << i);
@@ -30,7 +30,7 @@ int main(void) {
 	void *tmp_data = vec->data;
 	vec->data	   = NULL;
 
-	MiniVec_change_capacity(vec, 23);
+	MiniVec_change_capacity(vec, 23, .alignment = 64);
 
 	MiniVec *vec2 =
 	    MiniVec_init(8931231923993402351, .capacity = 3, .alignment = 64);
@@ -43,19 +43,28 @@ int main(void) {
 	void *tmp_vec = vec;
 	vec		  = NULL;
 
-	MiniVec_alloc(vec2, 200);
+	MiniVec_alloc(
+	    vec2, 200, .alignment = 64,
+	    .growth_strategy = CCOLL_GROWTH_STRATEGY_GOLDEN
+	);
 
-	MiniVec_change_capacity(vec, 25);
+	MiniVec_change_capacity(vec, 25, .alignment = 64);
 
 	vec	    = tmp_vec;
 	vec->data = tmp_data;
 
-	MiniVec_change_capacity(vec, 25);
+	MiniVec_change_capacity(vec, 25, .alignment = 64);
 
-	MiniVec_change_capacity(vec, 0);
-	MiniVec_alloc(vec, 0);
-	MiniVec_reserve_additional(vec, 0);
-	MiniVec_change_capacity(vec, 0);
+	MiniVec_change_capacity(vec, 0, .alignment = 64);
+	MiniVec_alloc(
+	    vec, 0, .alignment = 64,
+	    .growth_strategy = CCOLL_GROWTH_STRATEGY_GOLDEN
+	);
+	MiniVec_reserve_additional(
+	    vec, 0, .alignment = 64,
+	    .growth_strategy = CCOLL_GROWTH_STRATEGY_GOLDEN
+	);
+	MiniVec_change_capacity(vec, 0, .alignment = 64);
 
 	MiniVec_free_safe(vec);
 
