@@ -16,3 +16,5 @@ AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: WithoutElse
 
 BinPackParameters: false
+
+AlwaysBreakAfterDefinitionReturnType: None

@@ -13,6 +13,8 @@
 #include "../ccoll-codes.h"
 
 #define CCOLL_MINIVEC_MIN_CAPACITY 8
+#define CCOLL_MINIVEC_MIN_ALIGNMENT 4
+#define CCOLL_MINIVEC_DEFAULT_ALIGNMENT 8
 #define CCOLL_MINIVEC_GROWTH_STRATEGY CCOLL_GROWTH_STRATEGY_DOUBLE
 #define CCOLL_MINIVEC_ARG_CHECK 1
 #define CCOLL_MINIVEC_DEBUG 1
@@ -24,27 +26,34 @@ typedef struct MiniVec {
 	void *data;
 } MiniVec;
 
-#define MiniVec_mul_will_overflow(a, b) ((a) != 0 && (b) > SIZE_MAX / (a))
+struct _MiniVec_init_opts {
+	size_t capacity;
+	size_t alignment;
+};
 
 #define MiniVec_count_to_bytes(vec, idxs) ((vec)->item_size * (idxs))
 #define MiniVec_bytes_to_count(vec, bytes) ((bytes) / (vec)->item_size)
+#define MiniVec_mul_will_overflow(a, b) ((a) != 0 && (b) > SIZE_MAX / (a))
+#define MiniVec_round_up_bytes_to_alignment(size, alignment)                   \
+	(((size) + (alignment) - 1) / (alignment) * (alignment))
 
-struct _MiniVec_init_opts {
-	size_t capacity;
-};
+// TODO: make docs
 MiniVec *
 _MiniVec_init(size_t sizeof_item, const struct _MiniVec_init_opts *opts);
+// TODO: make docs
 #define MiniVec_init(sizeof_item, ...)                                         \
 	_MiniVec_init(                                                           \
 	    sizeof_item, &(const struct _MiniVec_init_opts){__VA_ARGS__}         \
 	)
 
-int MiniVec_free(MiniVec *vec);
+// TODO: make docs
+int _MiniVec_free(MiniVec *vec);
+// TODO: make docs
 #define MiniVec_free_safe(vec)                                                 \
 	({                                                                       \
 		int _result = CCOLL_NULL;                                          \
 		if (vec) {                                                         \
-			_result = MiniVec_free(vec);                                 \
+			_result = _MiniVec_free(vec);                                \
 			if (_result == CCOLL_SUCCESS) {                              \
 				(vec) = NULL;                                          \
 			}                                                            \
@@ -52,9 +61,13 @@ int MiniVec_free(MiniVec *vec);
 		_result;                                                           \
 	})
 
+// TODO: make docs
 int MiniVec_change_capacity(MiniVec *vec, const size_t capacity);
+// TODO: make docs
 int MiniVec_alloc(MiniVec *vec, const size_t idxs);
+// TODO: make docs
 int MiniVec_reserve_additional(MiniVec *vec, const size_t idxs);
+// TODO: make docs
 int MiniVec_shrink(MiniVec *vec);
 
 int MiniVec_set(MiniVec *vec, const void *data, size_t idx);

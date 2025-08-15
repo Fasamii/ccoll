@@ -165,7 +165,7 @@ int MiniVec_shrink(MiniVec *vec) {
 	return CCOLL_SUCCESS;
 }
 
-int MiniVec_free(MiniVec *vec) {
+int _MiniVec_free(MiniVec *vec) {
 	CCOLL_MINIVEC_INTEGRITY_CHECK(vec);
 
 	free(vec->data);
