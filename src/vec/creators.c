@@ -5,7 +5,7 @@
 #include "../../colors.h"
 #include "../../include/vec.h"
 
-Vec *Vec_init(const size_t size_of_data) {
+Vec *Vec_init(const size_t size_of_data, _MiniVec_init_args args) {
 	if (size_of_data == 0) return NULL;
 
 	Vec *vec = (Vec *)malloc(sizeof(Vec));

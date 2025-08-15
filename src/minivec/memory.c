@@ -1,4 +1,3 @@
-#include "../../ccoll-codes.h"
 #include "../../colors.h"
 #include "../../include/minivec.h"
 
@@ -11,7 +10,7 @@ static inline int _MiniVec_realloc(MiniVec *vec, size_t capacity) {
 		return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
 	}
 
-	if (MiniVec_mul_will_overflow(capacity, vec->element_size)) {
+	if (MiniVec_mul_will_overflow(capacity, vec->item_size)) {
 		CCOLL_MINIVEC_ERROR("bytes multiplication overflow");
 		return CCOLL_OVERFLOW;
 	}

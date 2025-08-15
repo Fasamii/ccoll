@@ -20,17 +20,24 @@
 typedef struct MiniVec {
 	size_t size;
 	size_t capacity;
-	size_t element_size;
+	size_t item_size;
 	void *data;
 } MiniVec;
 
 #define MiniVec_mul_will_overflow(a, b) ((a) != 0 && (b) > SIZE_MAX / (a))
 
-#define MiniVec_count_to_bytes(vec, idxs) ((vec)->element_size * (idxs))
-#define MiniVec_bytes_to_count(vec, bytes) ((bytes) / (vec)->element_size)
+#define MiniVec_count_to_bytes(vec, idxs) ((vec)->item_size * (idxs))
+#define MiniVec_bytes_to_count(vec, bytes) ((bytes) / (vec)->item_size)
 
-MiniVec *MiniVec_init(size_t sizeof_element);
-MiniVec *MiniVec_init_with(size_t sizeof_element, size_t min_capacity);
+struct _MiniVec_init_opts {
+	size_t capacity;
+};
+MiniVec *
+_MiniVec_init(size_t sizeof_item, const struct _MiniVec_init_opts *opts);
+#define MiniVec_init(sizeof_item, ...)                                         \
+	_MiniVec_init(                                                           \
+	    sizeof_item, &(const struct _MiniVec_init_opts){__VA_ARGS__}         \
+	)
 
 int MiniVec_free(MiniVec *vec);
 #define MiniVec_free_safe(vec)                                                 \
@@ -52,13 +59,15 @@ int MiniVec_shrink(MiniVec *vec);
 
 int MiniVec_set(MiniVec *vec, const void *data, size_t idx);
 int MiniVec_set_range(
-    MiniVec *vec, const void *data, const size_t start_idx,
+    MiniVec *vec,
+    const void *data,
+    const size_t start_idx,
     const size_t quantity
 );
 
 static inline void *
 MiniVec_get_unchecked_ptr(const MiniVec *vec, const size_t idx) {
-	return (char *)vec->data + (idx * vec->element_size);
+	return (char *)vec->data + (idx * vec->item_size);
 }
 static inline void *MiniVec_get_ptr(const MiniVec *vec, const size_t idx) {
 	if (!vec) return NULL;
@@ -81,7 +90,9 @@ int MiniVec_pop_front(MiniVec *vec);
 
 int MiniVec_insert(MiniVec *vec, const void *data, const size_t idx);
 int MiniVec_insert_range(
-    MiniVec *vec, const void *data, const size_t start_idx,
+    MiniVec *vec,
+    const void *data,
+    const size_t start_idx,
     const size_t quantity
 );
 
@@ -95,7 +106,9 @@ int MiniVec_append(MiniVec *base, const MiniVec *vec);
 int MiniVec_append_clone(MiniVec *vec1, MiniVec *vec2, MiniVec **new_vec);
 int MiniVec_split(MiniVec *base, MiniVec **new_vec, const size_t idx);
 int MiniVec_split_clone(
-    const MiniVec *base, MiniVec **new_vec1, MiniVec **new_vec2,
+    const MiniVec *base,
+    MiniVec **new_vec1,
+    MiniVec **new_vec2,
     const size_t idx
 );
 
@@ -137,9 +150,10 @@ int MiniVec_fill(MiniVec *vec, void *data);
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
-		    YEL "┌[ " RED "!!" YEL " ]" BLU " WARN::[" NOCOL "MiniVec" BLU \
-			  "]:[" MAG "FOO " NOCOL "%s()" BLU "]:[" MAG "FILE " NOCOL  \
-			  "%s" BLU "]:[" MAG "LINE " NOCOL "%d" BLU "]" NOCOL "\n",  \
+		    YEL "┌[ " RED "!!" YEL " ]" BLU " WARN"                        \
+			  "::[" NOCOL "MiniVec" BLU "]:[" MAG "FOO " NOCOL           \
+			  "%s()" BLU "]:[" MAG "FILE " NOCOL "%s" BLU "]:[" MAG      \
+			  "LINE " NOCOL "%d" BLU "]" NOCOL "\n",                     \
 		    __func__, __FILE__, __LINE__                                   \
 		);                                                                 \
 		fprintf(                                                           \
@@ -219,17 +233,12 @@ int MiniVec_fill(MiniVec *vec, void *data);
 		return CCOLL_NULL_INTERNAL_DATA;                                   \
 	}
 
-#define CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element)                  \
-	if ((sizeof_element == 0)) {                                             \
+#define CCOLL_MINIVEC_ITEM_SIZE_CHECK_NULL(sizeof_item)                        \
+	if (((sizeof_item) == 0)) {                                              \
 		CCOLL_MINIVEC_ERROR("element size 0 is not allowed");              \
 		return CCOLL_INVALID_ARGUMENT;                                     \
-	}                                                                        \
-	if (!(sizeof_element <= alignof(max_align_t))) {                         \
-		CCOLL_MINIVEC_ERROR(                                               \
-		    "Check if realloc and malloc will handle alligment correctly"  \
-		);                                                                 \
-		return CCOLL_INVALID_ARGUMENT;                                     \
 	}
+
 #define CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(a, b)                                 \
 	if (SIZE_MAX - a < b) {                                                  \
 		CCOLL_MINIVEC_ERROR("overflow");                                   \
@@ -237,7 +246,7 @@ int MiniVec_fill(MiniVec *vec, void *data);
 	}
 #else
 #define CCOLL_MINIVEC_INTEGRITY_CHECK(ptr)
-#define CCOLL_MINIVEC_ELEMENT_SIZE_CHECK_NULL(sizeof_element)
+#define CCOLL_MINIVEC_ITEM_SIZE_CHECK_NULL(sizeof_item)
 #define CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(a, b)
 #endif
 

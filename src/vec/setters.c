@@ -242,7 +242,6 @@ int Vec_append(Vec *base, const Vec *vec) {
 		if (Vec_reserve(base, toalloc)) return CCOLL_OUT_OF_MEMORY;
 	}
 
-	// TODO: check if that base operations and pointer calculations are safe
 	memcpy(
 	    base->data + (base->size * base->element_size), vec->data,
 	    Vec_idx_to_bytes(vec, vec->size)

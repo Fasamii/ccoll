@@ -14,3 +14,5 @@ AllowShortBlocksOnASingleLine: Empty
 
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: WithoutElse
+
+BinPackParameters: false
