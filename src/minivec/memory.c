@@ -8,38 +8,13 @@
 
 static inline int
 _MiniVec_realloc(MiniVec *vec, size_t capacity, size_t alignment) {
-	if (capacity == 0) {
-		CCOLL_MINIVEC_WARN("cannot request capacity of size 0");
-		return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
-	}
-
-	if (MiniVec_mul_will_overflow(capacity, vec->item_size)) {
-		CCOLL_MINIVEC_ERROR("bytes multiplication overflow");
-		return CCOLL_OVERFLOW;
-	}
+	CCOLL_MINIVEC_CHECK_MINIVEC_INTEGRITY(vec);
+	CCOLL_MINIVEC_CHECK_CAPACITY(capacity, vec->item_size);
+	CCOLL_MINIVEC_CHECK_ALIGNMENT(alignment);
 
 	if (capacity == vec->capacity) {
 		CCOLL_MINIVEC_LOG("nothing to do returning SUCCESS");
 		return CCOLL_SUCCESS;
-	}
-
-	if (capacity < vec->size) {
-		CCOLL_MINIVEC_WARN("Requested not enough memory to store vec size");
-		return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
-	}
-
-	if (alignment < CCOLL_MINIVEC_MIN_ALIGNMENT) {
-		CCOLL_MINIVEC_ERROR(
-		    "passed aalignment is smaller than CCOLL_MINIVEC_MIN_ALIGNMENT"
-		);
-		return CCOLL_INVALID_ARGUMENT; // TODO: make err code for alignment
-	}
-
-	if ((alignment & (alignment - 1)) != 0) {
-		CCOLL_MINIVEC_ERROR(
-		    "passed alignment isn't pover of two (%zu)", alignment
-		);
-		return CCOLL_INVALID_ARGUMENT; // TODO: make err code for alignment
 	}
 
 	size_t bytes_needed = MiniVec_count_to_bytes(vec, capacity);
@@ -121,7 +96,7 @@ int _MiniVec_change_capacity(
     const size_t capacity,
     const struct _MiniVec_change_capacity_opts *opts
 ) {
-	CCOLL_MINIVEC_INTEGRITY_CHECK(vec);
+	CCOLL_MINIVEC_CHECK_MINIVEC_INTEGRITY(vec);
 
 	size_t alignment = CCOLL_MINIVEC_DEFAULT_ALIGNMENT;
 
@@ -148,7 +123,7 @@ int _MiniVec_alloc(
     const size_t idxs,
     const struct _MiniVec_growth_capacity_opts *opts
 ) {
-	CCOLL_MINIVEC_INTEGRITY_CHECK(vec);
+	CCOLL_MINIVEC_CHECK_MINIVEC_INTEGRITY(vec);
 	CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(vec->capacity, idxs);
 
 	size_t alignment	     = CCOLL_MINIVEC_DEFAULT_ALIGNMENT;
@@ -188,7 +163,7 @@ int _MiniVec_reserve_additional(
     const size_t idxs,
     const struct _MiniVec_growth_capacity_opts *opts
 ) {
-	CCOLL_MINIVEC_INTEGRITY_CHECK(vec);
+	CCOLL_MINIVEC_CHECK_MINIVEC_INTEGRITY(vec);
 	CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(vec->size, idxs);
 
 	size_t alignment				  = CCOLL_MINIVEC_DEFAULT_ALIGNMENT;
@@ -223,7 +198,7 @@ int _MiniVec_reserve_additional(
 int _MiniVec_shrink(
     MiniVec *vec, const struct _MiniVec_change_capacity_opts *opts
 ) {
-	CCOLL_MINIVEC_INTEGRITY_CHECK(vec);
+	CCOLL_MINIVEC_CHECK_MINIVEC_INTEGRITY(vec);
 
 	if (vec->size == vec->capacity) {
 		CCOLL_MINIVEC_LOG("nothing to do returning SUCCESS");
@@ -251,7 +226,7 @@ int _MiniVec_shrink(
 }
 
 int _MiniVec_free(MiniVec *vec) {
-	CCOLL_MINIVEC_INTEGRITY_CHECK(vec);
+	CCOLL_MINIVEC_CHECK_MINIVEC_INTEGRITY(vec);
 
 	free(vec->data);
 	free(vec);

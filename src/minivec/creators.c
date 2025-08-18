@@ -8,31 +8,11 @@
 #include <stdlib.h>
 
 int _MiniVec_malloc(
-    MiniVec **to_alloc, size_t sizeof_item, size_t capacity, size_t alignment
+    MiniVec **to_alloc, size_t item_size, size_t capacity, size_t alignment
 ) {
-	CCOLL_MINIVEC_ITEM_SIZE_CHECK_NULL(sizeof_item);
-
-	if (capacity == 0) {
-		CCOLL_MINIVEC_ERROR("Passed capacity of size 0");
-		return CCOLL_NOT_ENOUGH_MEMORY_REQUESTED;
-	}
-
-	if (MiniVec_mul_will_overflow(capacity, sizeof_item)) {
-		CCOLL_MINIVEC_ERROR("bytes multiplication overflow");
-		return CCOLL_OVERFLOW;
-	}
-
-	if (alignment < CCOLL_MINIVEC_MIN_ALIGNMENT) {
-		CCOLL_MINIVEC_ERROR(
-		    "passed aalignment is smaller than CCOLL_MINIVEC_MIN_ALIGNMENT"
-		);
-		return CCOLL_INVALID_ARGUMENT; // TODO: make err code for alignment
-	}
-
-	if ((alignment & (alignment - 1)) != 0) {
-		CCOLL_MINIVEC_ERROR("passed alignment isn't pover of two (%zu)", capacity);
-		return CCOLL_INVALID_ARGUMENT; // TODO: make err code for alignment
-	}
+	CCOLL_MINIVEC_CHECK_ITEM_SIZE(item_size);
+	CCOLL_MINIVEC_CHECK_CAPACITY(capacity, item_size);
+	CCOLL_MINIVEC_CHECK_ALIGNMENT(alignment);
 
 	MiniVec *vec = malloc(sizeof(MiniVec));
 	if (!vec) {
@@ -41,14 +21,13 @@ int _MiniVec_malloc(
 	}
 
 	vec->size	   = 0;
-	vec->item_size = sizeof_item;
+	vec->item_size = item_size;
 	vec->capacity  = capacity;
 
-	size_t bytes_needed = MiniVec_count_to_bytes(vec, capacity);
 	size_t padded_bytes =
-	    MiniVec_round_up_bytes_to_alignment(bytes_needed, alignment);
+	    MiniVec_pad_bytes_to_alignment(vec, capacity, alignment);
 
-	if (padded_bytes < bytes_needed) {
+	if (padded_bytes < MiniVec_count_to_bytes(vec, capacity)) {
 		free(vec);
 		CCOLL_MINIVEC_ERROR("size_t overflow on alignment calculation");
 		return CCOLL_OVERFLOW;
@@ -75,7 +54,7 @@ int _MiniVec_malloc(
 }
 
 MiniVec *
-_MiniVec_init(size_t sizeof_item, const struct _MiniVec_init_opts *opts) {
+_MiniVec_init(size_t item_size, const struct _MiniVec_init_opts *opts) {
 
 	size_t capacity  = CCOLL_MINIVEC_MIN_CAPACITY;
 	size_t alignment = CCOLL_MINIVEC_DEFAULT_ALIGNMENT;
@@ -86,7 +65,7 @@ _MiniVec_init(size_t sizeof_item, const struct _MiniVec_init_opts *opts) {
 	}
 
 	MiniVec *vec = NULL;
-	if (_MiniVec_malloc(&vec, sizeof_item, capacity, alignment)) {
+	if (_MiniVec_malloc(&vec, item_size, capacity, alignment)) {
 		CCOLL_MINIVEC_ERROR("MiniVec init failed");
 		return NULL;
 	};

@@ -5,6 +5,13 @@
 #include "../../ccoll-codes.h"
 #include "../../include/vec.h"
 
+// TODO:IMPORTANT: make reusable _Vec_realloc function
+static inline int _Vec_realloc(Vec *vec, size_t capacity, size_t alignment) {
+	if (capacity == 0) {
+
+	}
+}
+
 int Vec_reserve(Vec *vec, const size_t idxs) {
 	if (!vec) return CCOLL_NULL;
 	if (!vec->data) return CCOLL_NULL_INTERNAL_DATA;

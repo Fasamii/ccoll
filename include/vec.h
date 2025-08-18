@@ -61,16 +61,21 @@
 #include "../ccoll-codes.h"
 
 #define CCOLL_VEC_MIN_CAPACITY 8
+#define CCOLL_VEC_DEBUG 1
 
 typedef struct Vec {
 	size_t size;
 	size_t capacity;
+	size_t alignment;
 	size_t element_size;
 	int (*on_change)(
 	    void *data, size_t idx, size_t element_size, CCOLL_OPERATION operation
 	);
 	void *data;
 } Vec;
+
+#include "../src/vec/checks.h"
+#include "../src/vec/debug.h"
 
 /////////////
 // HELPERS //

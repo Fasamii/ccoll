@@ -40,11 +40,9 @@ struct _MiniVec_growth_capacity_opts {
 	CCOLL_GROWTH_STRATEGY growth_strategy;
 };
 
-#define MiniVec_count_to_bytes(vec, idxs) ((vec)->item_size * (idxs))
-#define MiniVec_bytes_to_count(vec, bytes) ((bytes) / (vec)->item_size)
-#define MiniVec_mul_will_overflow(a, b) ((a) != 0 && (b) > SIZE_MAX / (a))
-#define MiniVec_round_up_bytes_to_alignment(size, alignment)                   \
-	(((size) + (alignment) - 1) / (alignment) * (alignment))
+#include "../src/minivec/checks.h"
+#include "../src/minivec/debug.h"
+#include "../src/minivec/helpers.h"
 
 // TODO: make docs
 MiniVec *
@@ -110,7 +108,9 @@ int _MiniVec_reserve_additional(
 	)
 
 // TODO: make docs
-int _MiniVec_shrink(MiniVec *vec, const struct _MiniVec_change_capacity_opts *opts);
+int _MiniVec_shrink(
+    MiniVec *vec, const struct _MiniVec_change_capacity_opts *opts
+);
 // TODO: make docs
 #define MiniVec_shrink()
 
@@ -183,128 +183,5 @@ static inline bool MiniVec_is_empty(MiniVec *vec) {
 
 int MiniVec_swap(MiniVec *vec, const size_t idx1, const size_t idx2);
 int MiniVec_fill(MiniVec *vec, void *data);
-
-#if CCOLL_MINIVEC_DEBUG
-
-#include <stdio.h>
-
-#include "../colors.h"
-
-#define CCOLL_MINIVEC_LOG(msg, ...)                                            \
-	do {                                                                     \
-		fprintf(                                                           \
-		    stdout,                                                        \
-		    BLU "┌[ " RED "!" BLU " ]" BLU " LOG::[" NOCOL "MiniVec" BLU   \
-			  "]:[" MAG "FOO " NOCOL "%s()" BLU "]:[" MAG "FILE " NOCOL  \
-			  "%s" BLU "]:[" MAG "LINE " NOCOL "%d" BLU "]" NOCOL "\n",  \
-		    __func__, __FILE__, __LINE__                                   \
-		);                                                                 \
-		fprintf(                                                           \
-		    stdout, BLU "└[msg]: " NOCOL msg NOCOL "\n\n", ##__VA_ARGS__   \
-		);                                                                 \
-	} while (0)
-#define CCOLL_MINIVEC_WARN(msg, ...)                                           \
-	do {                                                                     \
-		fprintf(                                                           \
-		    stdout,                                                        \
-		    YEL "┌[ " RED "!!" YEL " ]" BLU " WARN"                        \
-			  "::[" NOCOL "MiniVec" BLU "]:[" MAG "FOO " NOCOL           \
-			  "%s()" BLU "]:[" MAG "FILE " NOCOL "%s" BLU "]:[" MAG      \
-			  "LINE " NOCOL "%d" BLU "]" NOCOL "\n",                     \
-		    __func__, __FILE__, __LINE__                                   \
-		);                                                                 \
-		fprintf(                                                           \
-		    stdout, YEL "└[msg]: " NOCOL msg NOCOL "\n\n", ##__VA_ARGS__   \
-		);                                                                 \
-	} while (0)
-#define CCOLL_MINIVEC_ERROR(msg, ...)                                          \
-	do {                                                                     \
-		fprintf(                                                           \
-		    stdout,                                                        \
-		    RED "┌[ " RED "!!!" RED " ]" BLU " ERROR::[" NOCOL             \
-			  "MiniVec" BLU "]:[" MAG "FOO " NOCOL "%s()" BLU "]:[" MAG  \
-			  "FILE " NOCOL "%s" BLU "]:[" MAG "LINE " NOCOL "%d" BLU    \
-			  "]" NOCOL "\n",                                            \
-		    __func__, __FILE__, __LINE__                                   \
-		);                                                                 \
-		fprintf(                                                           \
-		    stdout, RED "└[msg]: " NOCOL msg NOCOL "\n\n", ##__VA_ARGS__   \
-		);                                                                 \
-	} while (0)
-#define CCOLL_MINIVEC_ASSERT(CONDITION, msg, ...)                              \
-	do {                                                                     \
-		if (!(CONDITION)) {                                                \
-			fprintf(                                                     \
-			    stderr,                                                  \
-			    RED "┌[///// [ASSERT FAIL] /////]" BLU ":[" NOCOL        \
-				  "MiniVec" BLU "]:[" MAG "FOO " NOCOL "%s" BLU        \
-				  "]:[" MAG "FILE " NOCOL "%s" BLU "]:[" MAG           \
-				  "LINE " NOCOL "%d" BLU "]" NOCOL "\n",               \
-			    __func__, __FILE__, __LINE__                             \
-			);                                                           \
-			fprintf(                                                     \
-			    stderr, RED "└[msg]: " NOCOL msg NOCOL "\n\n",           \
-			    ##__VA_ARGS__                                            \
-			);                                                           \
-		} else {                                                           \
-			fprintf(                                                     \
-			    stdout,                                                  \
-			    BLU "┌[" GRN "ASSERT SUCCESS" BLU "]::[" NOCOL           \
-				  "MiniVec" BLU "]::[" MAG "FOO " NOCOL "%s" BLU       \
-				  "]::[" MAG "FILE " NOCOL "%s" BLU "]::[" MAG         \
-				  "LINE " NOCOL "%d" BLU "]" NOCOL "\n",               \
-			    __func__, __FILE__, __LINE__                             \
-			);                                                           \
-			fprintf(                                                     \
-			    stdout, BLU "└[msg]: " NOCOL msg NOCOL "\n\n",           \
-			    ##__VA_ARGS__                                            \
-			);                                                           \
-		}                                                                  \
-	} while (0)
-#else
-#define CCOLL_MINIVEC_LOG(msg, ...)                                            \
-	do {                                                                     \
-	} while (0)
-
-#define CCOLL_MINIVEC_WARN(msg, ...)                                           \
-	do {                                                                     \
-	} while (0)
-#define CCOLL_MINIVEC_ERROR(msg, ...)                                          \
-	do {                                                                     \
-	} while (0)
-
-#define CCOLL_MINIVEC_ASSERT(CONDITION, msg, ...)                              \
-	do {                                                                     \
-	} while (0)
-
-#endif
-
-#if CCOLL_MINIVEC_ARG_CHECK
-#define CCOLL_MINIVEC_INTEGRITY_CHECK(ptr)                                     \
-	if (!(ptr)) {                                                            \
-		CCOLL_MINIVEC_ERROR("passed MiniVec is NULl");                     \
-		return CCOLL_NULL;                                                 \
-	};                                                                       \
-	if (!(ptr)->data) {                                                      \
-		CCOLL_MINIVEC_ERROR("data of passed MiniVec is NULL");             \
-		return CCOLL_NULL_INTERNAL_DATA;                                   \
-	}
-
-#define CCOLL_MINIVEC_ITEM_SIZE_CHECK_NULL(sizeof_item)                        \
-	if (((sizeof_item) == 0)) {                                              \
-		CCOLL_MINIVEC_ERROR("element size 0 is not allowed");              \
-		return CCOLL_INVALID_ARGUMENT;                                     \
-	}
-
-#define CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(a, b)                                 \
-	if (SIZE_MAX - a < b) {                                                  \
-		CCOLL_MINIVEC_ERROR("overflow");                                   \
-		return CCOLL_OVERFLOW;                                             \
-	}
-#else
-#define CCOLL_MINIVEC_INTEGRITY_CHECK(ptr)
-#define CCOLL_MINIVEC_ITEM_SIZE_CHECK_NULL(sizeof_item)
-#define CCOLL_MINIVEC_CHECK_OVERFLOW_ADD(a, b)
-#endif
 
 #endif
