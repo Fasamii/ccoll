@@ -44,10 +44,14 @@ struct _MiniVec_growth_capacity_opts {
 #include "../src/minivec/debug.h"
 #include "../src/minivec/helpers.h"
 
-// TODO: make docs
+// Internal implementation of MiniVec_init function
 MiniVec *
 _MiniVec_init(size_t sizeof_item, const struct _MiniVec_init_opts *opts);
-// TODO: make docs
+// Initializes MiniVec data structure
+// - size of single item
+// - options like
+// - - capacity - initial capacity
+// - - alignment - alignment (need to be specified also in later calls)
 #define MiniVec_init(sizeof_item, ...)                                         \
 	_MiniVec_init(                                                           \
 	    sizeof_item, &(const struct _MiniVec_init_opts){__VA_ARGS__}         \
@@ -55,7 +59,8 @@ _MiniVec_init(size_t sizeof_item, const struct _MiniVec_init_opts *opts);
 
 // TODO: make docs
 int _MiniVec_free(MiniVec *vec);
-// TODO: make docs
+// Free the MiniVec data structure
+// - pointer to MiniVec data structure
 #define MiniVec_free_safe(vec)                                                 \
 	({                                                                       \
 		int _result = CCOLL_NULL;                                          \
