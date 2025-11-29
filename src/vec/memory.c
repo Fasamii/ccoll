@@ -7,7 +7,7 @@
 #include <string.h>
 
 static inline int
-_Vec_realloc(Vec *vec, size_t capacity, size_t alignment) {
+_Vec_internal_realloc(Vec *vec, size_t capacity, size_t alignment) {
 	CCOLL_VEC_CHECK_VEC_INTEGRITY(vec);
 	CCOLL_VEC_CHECK_CAPACITY(capacity, vec->item_size);
 	CCOLL_VEC_CHECK_ALIGNMENT(alignment);
@@ -112,7 +112,7 @@ int _Vec_change_capacity(
 	}
 
 	int res = 0;
-	if ((res = _Vec_realloc(vec, capacity, alignment))) return res;
+	if ((res = _Vec_internal_realloc(vec, capacity, alignment))) return res;
 
 	CCOLL_LOG("operation successful");
 	return CCOLL_SUCCESS;
@@ -150,7 +150,7 @@ int _Vec_alloc(
 		return res;
 	}
 
-	if ((res = _Vec_realloc(vec, new_capacity, alignment))) {
+	if ((res = _Vec_internal_realloc(vec, new_capacity, alignment))) {
 		return res;
 	}
 
@@ -187,7 +187,7 @@ int _Vec_reserve_additional(
 		return res;
 	}
 
-	if ((res = _Vec_realloc(vec, new_capacity, alignment))) {
+	if ((res = _Vec_internal_realloc(vec, new_capacity, alignment))) {
 		return res;
 	}
 
@@ -219,7 +219,7 @@ int _Vec_shrink(
 	}
 
 	int res = 0;
-	if ((res = _Vec_realloc(vec, new_capacity, alignment))) return res;
+	if ((res = _Vec_internal_realloc(vec, new_capacity, alignment))) return res;
 
 	CCOLL_LOG("operation successful");
 	return CCOLL_SUCCESS;

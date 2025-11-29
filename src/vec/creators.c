@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int _Vec_malloc(
+int _Vec_internal_malloc(
     Vec **to_alloc, size_t item_size, size_t capacity, size_t alignment
 ) {
 	CCOLL_VEC_CHECK_ITEM_SIZE(item_size);
@@ -65,7 +65,7 @@ _Vec_init(size_t item_size, const struct _Vec_init_opts *opts) {
 	}
 
 	Vec *vec = NULL;
-	if (_Vec_malloc(&vec, item_size, capacity, alignment)) {
+	if (_Vec_internal_malloc(&vec, item_size, capacity, alignment)) {
 		CCOLL_ERROR("Vec init failed");
 		return NULL;
 	};
