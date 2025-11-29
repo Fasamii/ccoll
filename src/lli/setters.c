@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../ccoll-codes.h"
+#include "../../util/ccoll-codes.h"
 #include "../../include/lli.h"
 
 // TODO:TEST: Make test for that foo

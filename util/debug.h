@@ -1,14 +1,14 @@
-#if CCOLL_VEC_DEBUG
+#if CCOLL_DEBUG
 
 #include <stdio.h>
 
-#include "../../colors.h"
+#include "./colors.h"
 
-#define CCOLL_VEC_LOG(msg, ...)                                                \
+#define CCOLL_LOG(msg, ...)                                            \
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
-		    BLU "┌[ " RED "!" BLU " ]" BLU " LOG::[" NOCOL "Vec" BLU       \
+		    BLU "┌[ " RED "!" BLU " ]" BLU " LOG::[" NOCOL "Vec" BLU   \
 			  "]:[" MAG "FOO " NOCOL "%s()" BLU "]:[" MAG "FILE " NOCOL  \
 			  "%s" BLU "]:[" MAG "LINE " NOCOL "%d" BLU "]" NOCOL "\n",  \
 		    __func__, __FILE__, __LINE__                                   \
@@ -18,14 +18,14 @@
 		);                                                                 \
 	} while (0)
 
-#define CCOLL_MINIVEC_WARN(msg, ...)                                           \
+#define CCOLL_WARN(msg, ...)                                           \
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
 		    YEL "┌[ " RED "!!" YEL " ]" BLU " WARN"                        \
-			  "::[" NOCOL "Vec" BLU "]:[" MAG "FOO " NOCOL "%s()" BLU    \
-			  "]:[" MAG "FILE " NOCOL "%s" BLU "]:[" MAG "LINE " NOCOL   \
-			  "%d" BLU "]" NOCOL "\n",                                   \
+			  "::[" NOCOL "Vec" BLU "]:[" MAG "FOO " NOCOL           \
+			  "%s()" BLU "]:[" MAG "FILE " NOCOL "%s" BLU "]:[" MAG      \
+			  "LINE " NOCOL "%d" BLU "]" NOCOL "\n",                     \
 		    __func__, __FILE__, __LINE__                                   \
 		);                                                                 \
 		fprintf(                                                           \
@@ -33,13 +33,14 @@
 		);                                                                 \
 	} while (0)
 
-#define CCOLL_VEC_ERROR(msg, ...)                                              \
+#define CCOLL_ERROR(msg, ...)                                          \
 	do {                                                                     \
 		fprintf(                                                           \
 		    stdout,                                                        \
-		    RED "┌[ " RED "!!!" RED " ]" BLU " ERROR::[" NOCOL "Vec" BLU   \
-			  "]:[" MAG "FOO " NOCOL "%s()" BLU "]:[" MAG "FILE " NOCOL  \
-			  "%s" BLU "]:[" MAG "LINE " NOCOL "%d" BLU "]" NOCOL "\n",  \
+		    RED "┌[ " RED "!!!" RED " ]" BLU " ERROR::[" NOCOL             \
+			  "Vec" BLU "]:[" MAG "FOO " NOCOL "%s()" BLU "]:[" MAG  \
+			  "FILE " NOCOL "%s" BLU "]:[" MAG "LINE " NOCOL "%d" BLU    \
+			  "]" NOCOL "\n",                                            \
 		    __func__, __FILE__, __LINE__                                   \
 		);                                                                 \
 		fprintf(                                                           \
@@ -47,15 +48,15 @@
 		);                                                                 \
 	} while (0)
 
-#define CCOLL_VEC_ASSERT(CONDITION, msg, ...)                                  \
+#define CCOLL_ASSERT(CONDITION, msg, ...)                              \
 	do {                                                                     \
 		if (!(CONDITION)) {                                                \
 			fprintf(                                                     \
 			    stderr,                                                  \
-			    RED "┌[///// [ASSERT FAIL] /////]" BLU ":[" NOCOL        \
-				  "Vec" BLU "]:[" MAG "FOO " NOCOL "%s" BLU "]:[" MAG  \
-				  "FILE " NOCOL "%s" BLU "]:[" MAG "LINE " NOCOL       \
-				  "%d" BLU "]" NOCOL "\n",                             \
+			    RED "┌[///// [ASSERT FAIL] /////]" BLU "::[" NOCOL        \
+				  "Vec" BLU "]:[" MAG "FOO " NOCOL "%s" BLU        \
+				  "]:[" MAG "FILE " NOCOL "%s" BLU "]:[" MAG           \
+				  "LINE " NOCOL "%d" BLU "]" NOCOL "\n",               \
 			    __func__, __FILE__, __LINE__                             \
 			);                                                           \
 			fprintf(                                                     \
@@ -65,9 +66,9 @@
 		} else {                                                           \
 			fprintf(                                                     \
 			    stdout,                                                  \
-			    BLU "┌[" GRN "ASSERT SUCCESS" BLU "]::[" NOCOL "Vec" BLU \
-				  "]::[" MAG "FOO " NOCOL "%s" BLU "]::[" MAG          \
-				  "FILE " NOCOL "%s" BLU "]::[" MAG "LINE " NOCOL      \
+			    GRN "┌[ASSERT SUCCESS]" BLU "::[" NOCOL "Vec" BLU    \
+				  "]:[" MAG "FOO " NOCOL "%s" BLU "]:[" MAG          \
+				  "FILE " NOCOL "%s" BLU "]:[" MAG "LINE " NOCOL      \
 				  "%d" BLU "]" NOCOL "\n",                             \
 			    __func__, __FILE__, __LINE__                             \
 			);                                                           \
@@ -79,18 +80,18 @@
 	} while (0)
 
 #else
-#define CCOLL_VEC_LOG(msg, ...)                                                \
+#define CCOLL_LOG(msg, ...)                                            \
 	do {                                                                     \
 	} while (0)
 
-#define CCOLL_VEC_WARN(msg, ...)                                               \
+#define CCOLL_WARN(msg, ...)                                           \
 	do {                                                                     \
 	} while (0)
-#define CCOLL_VEC_ERROR(msg, ...)                                              \
+#define CCOLL_ERROR(msg, ...)                                          \
 	do {                                                                     \
 	} while (0)
 
-#define CCOLL_VEC_ASSERT(CONDITION, msg, ...)                                  \
+#define CCOLL_ASSERT(CONDITION, msg, ...)                              \
 	do {                                                                     \
 	} while (0)
 

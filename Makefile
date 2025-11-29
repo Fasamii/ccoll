@@ -14,7 +14,7 @@ CFLAGS      := -Wall -Wextra -std=c11 -O2 -I$(INCLUDE_DIR)
 ARFLAGS     := rcs
 
 # === Modules ===
-MODULES     := vec minivec lli
+MODULES     := vec lli
 
 # === Color definitions ===
 COLOR_CC    := \e[38;5;5m

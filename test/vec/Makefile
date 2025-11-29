@@ -1,5 +1,5 @@
 # === Config ===
-CCOLL := vec
+CCOLL := vec 
 # === Config ===
 TOP_DIR := ../..
 LIB_NAME := lib$(CCOLL).a

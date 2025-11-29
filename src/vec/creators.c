@@ -1,59 +1,74 @@
+#include "../../include/vec.h"
+#include "./checks.h"
+
+#include <stdalign.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "../../ccoll-codes.h"
-#include "../../colors.h"
-#include "../../include/vec.h"
-
-Vec *Vec_init(const size_t size_of_data) {
-	if (size_of_data == 0) return NULL;
-
-	Vec *vec = (Vec *)malloc(sizeof(Vec));
-	if (!vec) return NULL;
-
-	vec->size		= 0;
-	vec->element_size = size_of_data;
-	vec->capacity	= CCOLL_VEC_MIN_CAPACITY;
-	vec->on_change= NULL;
-
-	vec->data = (void *)malloc(vec->capacity * vec->element_size);
-	if (!vec->data) {
-		free(vec);
-		return NULL;
-	}
-
-	return vec;
-}
-
-Vec *Vec_init_with(const size_t size_of_data, const size_t min_capacity) {
-	if (size_of_data == 0) return NULL;
-	if (min_capacity == 0) return NULL;
-
-	Vec *vec = (Vec *)malloc(sizeof(Vec));
-	if (!vec) return NULL;
-
-	vec->size		= 0;
-	vec->element_size = size_of_data;
-	vec->capacity	= min_capacity;
-	vec->on_change= NULL;
-
-	vec->data = (void *)malloc(vec->capacity * vec->element_size);
-	if (!vec->data) {
-		free(vec);
-		return NULL;
-	}
-
-	return vec;
-}
-
-int Vec_set_on_change_callback(
-    Vec *vec,
-    int (*fn)(
-	  void *, size_t idx, size_t element_size, CCOLL_OPERATION operation
-    )
+int _Vec_malloc(
+    Vec **to_alloc, size_t item_size, size_t capacity, size_t alignment
 ) {
-	if (!vec) return CCOLL_NULL;
-	if (!fn) return CCOLL_NULL_FN;
-	vec->on_change= fn;
+	CCOLL_VEC_CHECK_ITEM_SIZE(item_size);
+	CCOLL_VEC_CHECK_CAPACITY(capacity, item_size);
+	CCOLL_VEC_CHECK_ALIGNMENT(alignment);
+
+	Vec *vec = malloc(sizeof(Vec));
+	if (!vec) {
+		CCOLL_ERROR("malloc for Vec returned NULL");
+		return CCOLL_OUT_OF_MEMORY;
+	}
+
+	vec->size	   = 0;
+	vec->item_size = item_size;
+	vec->capacity  = capacity;
+
+	size_t padded_bytes =
+	    Vec_pad_bytes_to_alignment(vec, capacity, alignment);
+
+	if (padded_bytes < Vec_count_to_bytes(vec, capacity)) {
+		free(vec);
+		CCOLL_ERROR("size_t overflow on alignment calculation");
+		return CCOLL_OVERFLOW;
+	}
+
+	vec->data = aligned_alloc(alignment, padded_bytes);
+	if (!vec->data) {
+		CCOLL_ERROR("malloc for Vec data returned NULL");
+		free(vec);
+		return CCOLL_OUT_OF_MEMORY;
+	}
+
+	*to_alloc = vec;
+
+	CCOLL_LOG(
+	    "operation successful, allocated space for %zu items with %zu "
+	    "alignment (allocated %zu bytes)",
+	    vec->capacity, alignment,
+	    Vec_round_up_bytes_to_alignment(
+		  Vec_count_to_bytes(vec, vec->capacity), alignment
+	    )
+	);
 	return CCOLL_SUCCESS;
+}
+
+Vec *
+_Vec_init(size_t item_size, const struct _Vec_init_opts *opts) {
+
+	size_t capacity  = CCOLL_VEC_MIN_CAPACITY;
+	size_t alignment = CCOLL_VEC_DEFAULT_ALIGNMENT;
+
+	if (opts) {
+		if (opts->capacity) capacity = opts->capacity;
+		if (opts->alignment) alignment = opts->alignment;
+	}
+
+	Vec *vec = NULL;
+	if (_Vec_malloc(&vec, item_size, capacity, alignment)) {
+		CCOLL_ERROR("Vec init failed");
+		return NULL;
+	};
+
+	return vec;
 }
