@@ -1,6 +1,4 @@
-/*
- * Vec - A minimalist version of Vec
- */
+/* Vec - A minimalist version of Vec */
 
 #ifndef CCOLL_VEC_H
 #define CCOLL_VEC_H
@@ -32,32 +30,30 @@ struct _Vec_init_opts {
 	size_t capacity;
 	size_t alignment;
 };
+
 // Internal implementation of Vec_init function
-Vec *
-_Vec_init(size_t sizeof_item, const struct _Vec_init_opts *opts);
+Vec *_Vec_init(size_t sizeof_item, const struct _Vec_init_opts *opts);
 // Initializes Vec data structure
 // - size of single item
 // - options like
 // - - capacity - initial capacity
 // - - alignment - alignment (need to be specified also in later calls)
-#define Vec_init(sizeof_item, ...)                                         \
-	_Vec_init(                                                           \
-	    sizeof_item, &(const struct _Vec_init_opts){__VA_ARGS__}         \
-	)
+#define Vec_init(sizeof_item, ...) _Vec_init(						 \
+	sizeof_item, &(const struct _Vec_init_opts){__VA_ARGS__}			 \
+)
 
-// TODO: make docs
+// Internal implementation of Vec_free function
 int _Vec_free(Vec *vec);
 // Free the Vec data structure
 // - pointer to Vec data structure
-#define Vec_free_safe(vec)                                                 \
+#define Vec_free(vec)										 \
 	({                                                                       \
-		int _result = CCOLL_NULL;                                          \
-		if (vec) {                                                         \
-			_result = _Vec_free(vec);                                \
-			if (_result == CCOLL_SUCCESS) {                              \
-				(vec) = NULL;                                          \
-			}                                                            \
-		}                                                                  \
+		int _result = _Vec_free(vec);							 \
+		if (_result == CCOLL_SUCCESS) {						 \
+			(vec) = NULL;								 \
+		} else {										 \
+			CCOLL_ERROR("free returned error");					 \
+		}											 \
 		_result;                                                           \
 	})
 
@@ -71,10 +67,10 @@ int _Vec_change_capacity(
     const struct _Vec_change_capacity_opts *opts
 );
 // TODO: make docs
-#define Vec_change_capacity(vec, capacity, ...)                            \
-	_Vec_change_capacity(                                                \
+#define Vec_change_capacity(vec, capacity, ...)						 \
+	_Vec_change_capacity(									 \
 	    vec, capacity,                                                       \
-	    &(const struct _Vec_change_capacity_opts){__VA_ARGS__}           \
+	    &(const struct _Vec_change_capacity_opts){__VA_ARGS__}			 \
 	)
 
 struct _Vec_growth_capacity_opts {
@@ -114,7 +110,8 @@ int _Vec_shrink(
 // TODO: make docs
 #define Vec_shrink()
 
-int Vec_set(Vec *vec, const void *data, size_t idx);
+int Vec_set(Vec *vec, const size_t idx, const void *data);
+
 int Vec_set_range(
     Vec *vec,
     const void *data,

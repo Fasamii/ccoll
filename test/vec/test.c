@@ -6,7 +6,7 @@ int main(void) {
 
 	Vec *vec = Vec_init(sizeof(char));
 	for (size_t i = 0; i < 10; i++) {
-		Vec_free_safe(vec);
+		Vec_free(vec);
 		size_t cap = 9;
 		vec	     = Vec_init(2, .capacity = cap, .alignment = 1U << i);
 		if (vec && vec->capacity != cap) {
@@ -19,7 +19,7 @@ int main(void) {
 			CCOLL_WARN("vec is null");
 		}
 	}
-	Vec_free_safe(vec);
+	Vec_free(vec);
 	vec = Vec_init(sizeof(char), .alignment = 8, .capacity = 9);
 
 	Vec_reserve_additional(vec, 333);
@@ -34,7 +34,7 @@ int main(void) {
 
 	Vec *vec2 =
 	    Vec_init(8931231923993402351, .capacity = 3, .alignment = 64);
-	Vec_free_safe(vec2);
+	Vec_free(vec2);
 
 	vec2 = Vec_init(8931231923993402351, .capacity = 12);
 
@@ -66,7 +66,7 @@ int main(void) {
 	);
 	Vec_change_capacity(vec, 0, .alignment = 64);
 
-	Vec_free_safe(vec);
+	Vec_free(vec);
 
 	return 0;
 }
